@@ -1,70 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>GrowAGarden Plant Cost Calculator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GrowAGarden Calculator</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0fff5;
+      background: #e6f9ee;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: 2em;
-      text-align: center;
     }
+
+    h1 {
+      color: #248f50;
+      font-size: 2rem;
+    }
+
+    .calculator {
+      background: white;
+      padding: 1.5em;
+      border-radius: 1em;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    label {
+      display: block;
+      margin: 0.75em 0 0.25em;
+      font-weight: bold;
+    }
+
     input, select, button {
-      padding: 0.5em;
-      margin: 0.5em;
+      width: 100%;
+      padding: 0.6em;
+      margin-bottom: 1em;
+      border: 1px solid #ccc;
+      border-radius: 0.4em;
       font-size: 1em;
     }
+
+    button {
+      background-color: #31a76d;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #278e5a;
+    }
+
     .result {
-      font-size: 1.5em;
-      margin-top: 1em;
+      font-size: 1.3em;
       font-weight: bold;
+      color: #333;
+      margin-top: 1em;
     }
   </style>
 </head>
 <body>
-  <h1>🌿 GrowAGarden Price Calculator</h1>
-
-  <label>
-    Fruit:
+  <h1>🌱 GrowAGarden Calculator</h1>
+  <div class="calculator">
+    <label for="fruit">Fruit Type</label>
     <select id="fruit">
       <option value="strawberry">Strawberry</option>
       <option value="dragon">Dragon Fruit</option>
     </select>
-  </label><br>
 
-  <label>
-    Weight (kg):
+    <label for="weight">Weight (kg)</label>
     <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42">
-  </label><br>
 
-  <label>
-    Wet:
+    <label for="wet">Wet?</label>
     <select id="wet">
       <option value="yes">Yes</option>
       <option value="no">No</option>
     </select>
-  </label><br>
 
-  <label>
-    Golden:
+    <label for="gold">Golden?</label>
     <select id="gold">
       <option value="no">No</option>
       <option value="yes">Yes</option>
     </select>
-  </label><br>
 
-  <label>
-    Moonlit:
+    <label for="moonlit">Moonlit?</label>
     <select id="moonlit">
       <option value="no">No</option>
       <option value="yes">Yes</option>
     </select>
-  </label><br>
 
-  <button onclick="calculate()">💰 Calculate Price</button>
-
-  <div class="result" id="price"></div>
+    <button onclick="calculate()">💰 Calculate</button>
+    <div class="result" id="price">Estimated Price: —</div>
+  </div>
 
   <script>
     function calculate() {
@@ -75,23 +106,31 @@
       const isMoonlit = document.getElementById("moonlit").value === "yes";
 
       if (isNaN(weight) || weight <= 0) {
-        document.getElementById("price").innerText = "Please enter a valid weight.";
+        document.getElementById("price").innerText = "❗ Please enter a valid weight.";
         return;
       }
 
       let basePricePerKg = 0;
 
       if (fruit === "strawberry") {
-        basePricePerKg = isWet ? 100 : 63;
-        if (isGold) basePricePerKg = 2740;
+        if (isGold) {
+          basePricePerKg = 2740;
+        } else {
+          basePricePerKg = isWet ? 104 : 63;
+        }
       } else if (fruit === "dragon") {
-        basePricePerKg = isWet ? 200 : 120;
-        if (isGold) basePricePerKg = 3400;
-        if (isMoonlit && isWet) basePricePerKg = 1307;
+        if (isGold) {
+          basePricePerKg = 3400;
+        } else if (isMoonlit && isWet) {
+          basePricePerKg = 1307;
+        } else {
+          basePricePerKg = isWet ? 200 : 120;
+        }
       }
 
       const totalPrice = Math.round(weight * basePricePerKg);
-      document.getElementById("price").innerText = `Estimated Price: ${totalPrice} cents (${(totalPrice / 100).toFixed(2)} Robux)`;
+      document.getElementById("price").innerText =
+        `Estimated Price: ${totalPrice} cents (${(totalPrice / 100).toFixed(2)} Robux)`;
     }
   </script>
 </body>
