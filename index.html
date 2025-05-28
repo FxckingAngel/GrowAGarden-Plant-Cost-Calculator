@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GrowAGarden Plant Cost Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5fff5;
+      padding: 2em;
+      text-align: center;
+    }
+    input, select, button {
+      padding: 0.5em;
+      margin: 0.5em;
+      font-size: 1em;
+    }
+    .result {
+      font-size: 1.5em;
+      margin-top: 1em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>GrowAGarden Strawberry Price Calculator 🍓</h1>
+  <label>
+    Weight (kg):
+    <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42">
+  </label><br>
+
+  <label>
+    Wet:
+    <select id="wet">
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
+    </select>
+  </label><br>
+
+  <label>
+    Golden:
+    <select id="gold">
+      <option value="no">No</option>
+      <option value="yes">Yes</option>
+    </select>
+  </label><br>
+
+  <button onclick="calculate()">💰 Calculate Price</button>
+
+  <div class="result" id="price"></div>
+
+  <script>
+    function calculate() {
+      const weight = parseFloat(document.getElementById("weight").value);
+      const isWet = document.getElementById("wet").value === "yes";
+      const isGold = document.getElementById("gold").value === "yes";
+
+      if (isNaN(weight)) {
+        document.getElementById("price").innerText = "Please enter a valid weight.";
+        return;
+      }
+
+      let basePricePerKg = isWet ? 100 : 63;
+      if (isGold) basePricePerKg = 2740;
+
+      const totalPrice = Math.round(weight * basePricePerKg);
+      document.getElementById("price").innerText = `Estimated Price: ${totalPrice} cents (${(totalPrice / 100).toFixed(2)} Robux)`;
+    }
+  </script>
+</body>
+</html>
