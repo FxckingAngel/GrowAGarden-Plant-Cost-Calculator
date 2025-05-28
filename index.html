@@ -66,31 +66,48 @@
 <body>
   <h1>🌱 GrowAGarden Calculator</h1>
   <div class="calculator">
-    <label for="fruit">Fruit Type</label>
+    <label for="fruit">Plant Type</label>
     <select id="fruit">
+      <option value="carrot">Carrot</option>
       <option value="strawberry">Strawberry</option>
-      <option value="dragon">Dragon Fruit</option>
+      <option value="blueberry">Blueberry</option>
+      <option value="orangetulip">Orangetulip</option>
+      <option value="tomato">Tomato</option>
+      <option value="corn">Corn</option>
+      <option value="daffodil">Daffodil</option>
+      <option value="watermelon">Watermelon</option>
+      <option value="pumpkin">Pumpkin</option>
+      <option value="apple">Apple</option>
+      <option value="bamboo">Bamboo</option>
+      <option value="coconut">Coconut</option>
+      <option value="cactus">Cactus</option>
+      <option value="dragon">Dragonfruit</option>
+      <option value="mango">Mango</option>
+      <option value="grape">Grape</option>
+      <option value="mushroom">Mushroom</option>
+      <option value="pepper">Pepper</option>
+      <option value="cacao">Cacao</option>
+      <option value="beanstalk">Beanstalk</option>
     </select>
 
     <label for="weight">Weight (kg)</label>
     <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42">
 
-    <label for="wet">Wet?</label>
-    <select id="wet">
-      <option value="yes">Yes</option>
-      <option value="no">No</option>
-    </select>
-
-    <label for="gold">Golden?</label>
-    <select id="gold">
-      <option value="no">No</option>
-      <option value="yes">Yes</option>
-    </select>
-
-    <label for="moonlit">Moonlit?</label>
-    <select id="moonlit">
-      <option value="no">No</option>
-      <option value="yes">Yes</option>
+    <label for="modifiers">Modifiers</label>
+    <select id="modifiers" multiple size="8">
+      <option value="rainbow">Rainbow</option>
+      <option value="gold">Gold</option>
+      <option value="shocked">Shocked</option>
+      <option value="frozen">Frozen</option>
+      <option value="wet">Wet</option>
+      <option value="chilled">Chilled</option>
+      <option value="choc">Choc</option>
+      <option value="moonlit">Moonlit</option>
+      <option value="bloodlit">Bloodlit</option>
+      <option value="celestial">Celestial</option>
+      <option value="disco">Disco</option>
+      <option value="zomb">Zomb</option>
+      <option value="plasma">Plasma</option>
     </select>
 
     <button onclick="calculate()">💰 Calculate</button>
@@ -101,34 +118,54 @@
     function calculate() {
       const weight = parseFloat(document.getElementById("weight").value);
       const fruit = document.getElementById("fruit").value;
-      const isWet = document.getElementById("wet").value === "yes";
-      const isGold = document.getElementById("gold").value === "yes";
-      const isMoonlit = document.getElementById("moonlit").value === "yes";
+      const modifiers = Array.from(document.getElementById("modifiers").selectedOptions).map(opt => opt.value);
 
       if (isNaN(weight) || weight <= 0) {
         document.getElementById("price").innerText = "❗ Please enter a valid weight.";
         return;
       }
 
-      let basePricePerKg = 0;
+      let basePricePerKg = 100;
 
-      if (fruit === "strawberry") {
-        if (isGold) {
-          basePricePerKg = 2740;
-        } else {
-          basePricePerKg = isWet ? 104 : 63;
-        }
-      } else if (fruit === "dragon") {
-        if (isGold) {
-          basePricePerKg = 3400;
-        } else if (isMoonlit && isWet) {
-          basePricePerKg = 1307;
-        } else {
-          basePricePerKg = isWet ? 200 : 120;
+      switch (fruit) {
+        case "strawberry":
+          if (modifiers.includes("gold")) basePricePerKg = 2740;
+          else basePricePerKg = modifiers.includes("wet") ? 104 : 63;
+          break;
+        case "dragon":
+          if (modifiers.includes("gold")) basePricePerKg = 3400;
+          else if (modifiers.includes("moonlit") && modifiers.includes("wet")) basePricePerKg = 1307;
+          else basePricePerKg = modifiers.includes("wet") ? 200 : 120;
+          break;
+        default:
+          basePricePerKg = 100;
+      }
+
+      // Bonus multiplier per modifier
+      const modifierMultipliers = {
+        rainbow: 1.5,
+        gold: 2.0,
+        shocked: 1.2,
+        frozen: 1.1,
+        wet: 1.1,
+        chilled: 1.1,
+        choc: 1.3,
+        moonlit: 1.4,
+        bloodlit: 1.3,
+        celestial: 1.6,
+        disco: 1.5,
+        zomb: 1.3,
+        plasma: 1.7
+      };
+
+      let multiplier = 1.0;
+      for (const mod of modifiers) {
+        if (modifierMultipliers[mod]) {
+          multiplier *= modifierMultipliers[mod];
         }
       }
 
-      const totalPrice = Math.round(weight * basePricePerKg);
+      const totalPrice = Math.round(weight * basePricePerKg * multiplier);
       document.getElementById("price").innerText =
         `Estimated Price: ${totalPrice} cents (${(totalPrice / 100).toFixed(2)} Robux)`;
     }
