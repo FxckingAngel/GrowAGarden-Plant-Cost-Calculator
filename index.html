@@ -6,7 +6,7 @@
   <title>GrowAGarden Calculator</title>
   <style>
     body {
-      background: #e6f9ee;
+      background: linear-gradient(to bottom, #e8fff1, #c7f5df);
       font-family: 'Segoe UI', sans-serif;
       display: flex;
       flex-direction: column;
@@ -15,58 +15,74 @@
     }
 
     h1 {
-      color: #248f50;
-      font-size: 2rem;
+      color: #228b57;
+      font-size: 2.2rem;
+      margin-bottom: 1em;
+      text-align: center;
     }
 
     .calculator {
       background: white;
-      padding: 1.5em;
+      padding: 2em;
       border-radius: 1em;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      max-width: 400px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      max-width: 500px;
       width: 100%;
     }
 
     label {
       display: block;
-      margin: 0.75em 0 0.25em;
-      font-weight: bold;
+      margin: 1em 0 0.3em;
+      font-weight: 600;
+      font-size: 1.05em;
+      color: #333;
     }
 
     input, select, button {
       width: 100%;
-      padding: 0.6em;
+      padding: 0.65em;
       margin-bottom: 1em;
       border: 1px solid #ccc;
-      border-radius: 0.4em;
+      border-radius: 0.5em;
       font-size: 1em;
+      box-sizing: border-box;
+    }
+
+    select[multiple] {
+      height: 10em;
     }
 
     button {
-      background-color: #31a76d;
+      background-color: #34c274;
       color: white;
+      font-weight: bold;
       border: none;
-      cursor: pointer;
       transition: background 0.2s ease;
     }
 
     button:hover {
-      background-color: #278e5a;
+      background-color: #2aa363;
     }
 
     .result {
       font-size: 1.3em;
       font-weight: bold;
-      color: #333;
+      color: #2c2c2c;
       margin-top: 1em;
+      text-align: center;
+    }
+
+    footer {
+      margin-top: 3em;
+      font-size: 0.9em;
+      color: #666;
     }
   </style>
 </head>
 <body>
-  <h1>🌱 GrowAGarden Calculator</h1>
+  <h1>🌿 GrowAGarden Plant Cost Calculator</h1>
   <div class="calculator">
-    <label for="fruit">Plant Type</label>
+    <label for="fruit">Choose Plant</label>
     <select id="fruit">
       <option value="carrot">Carrot</option>
       <option value="strawberry">Strawberry</option>
@@ -90,29 +106,33 @@
       <option value="beanstalk">Beanstalk</option>
     </select>
 
-    <label for="weight">Weight (kg)</label>
+    <label for="weight">Enter Weight (kg)</label>
     <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42">
 
-    <label for="modifiers">Modifiers</label>
-    <select id="modifiers" multiple size="8">
-      <option value="rainbow">Rainbow</option>
-      <option value="gold">Gold</option>
-      <option value="shocked">Shocked</option>
-      <option value="frozen">Frozen</option>
-      <option value="wet">Wet</option>
-      <option value="chilled">Chilled</option>
-      <option value="choc">Choc</option>
-      <option value="moonlit">Moonlit</option>
-      <option value="bloodlit">Bloodlit</option>
-      <option value="celestial">Celestial</option>
-      <option value="disco">Disco</option>
-      <option value="zomb">Zomb</option>
-      <option value="plasma">Plasma</option>
+    <label for="modifiers">Select Modifiers (hold Ctrl or Cmd to pick many)</label>
+    <select id="modifiers" multiple>
+      <option value="rainbow">🌈 Rainbow</option>
+      <option value="gold">🥇 Gold</option>
+      <option value="shocked">⚡ Shocked</option>
+      <option value="frozen">❄️ Frozen</option>
+      <option value="wet">💧 Wet</option>
+      <option value="chilled">🧊 Chilled</option>
+      <option value="choc">🍫 Choc</option>
+      <option value="moonlit">🌙 Moonlit</option>
+      <option value="bloodlit">🩸 Bloodlit</option>
+      <option value="celestial">✨ Celestial</option>
+      <option value="disco">🕺 Disco</option>
+      <option value="zomb">🧟 Zomb</option>
+      <option value="plasma">🔋 Plasma</option>
     </select>
 
-    <button onclick="calculate()">💰 Calculate</button>
+    <button onclick="calculate()">💰 Calculate Price</button>
     <div class="result" id="price">Estimated Price: —</div>
   </div>
+
+  <footer>
+    Not affiliated with Roblox or GrowAGarden. Made by fans 🌱
+  </footer>
 
   <script>
     function calculate() {
@@ -141,7 +161,6 @@
           basePricePerKg = 100;
       }
 
-      // Bonus multiplier per modifier
       const modifierMultipliers = {
         rainbow: 1.5,
         gold: 2.0,
