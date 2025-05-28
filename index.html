@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5fff5;
+      background: #f0fff5;
       padding: 2em;
       text-align: center;
     }
@@ -23,7 +23,16 @@
   </style>
 </head>
 <body>
-  <h1>GrowAGarden Strawberry Price Calculator 🍓</h1>
+  <h1>🌿 GrowAGarden Price Calculator</h1>
+
+  <label>
+    Fruit:
+    <select id="fruit">
+      <option value="strawberry">Strawberry</option>
+      <option value="dragon">Dragon Fruit</option>
+    </select>
+  </label><br>
+
   <label>
     Weight (kg):
     <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42">
@@ -45,6 +54,14 @@
     </select>
   </label><br>
 
+  <label>
+    Moonlit:
+    <select id="moonlit">
+      <option value="no">No</option>
+      <option value="yes">Yes</option>
+    </select>
+  </label><br>
+
   <button onclick="calculate()">💰 Calculate Price</button>
 
   <div class="result" id="price"></div>
@@ -52,16 +69,26 @@
   <script>
     function calculate() {
       const weight = parseFloat(document.getElementById("weight").value);
+      const fruit = document.getElementById("fruit").value;
       const isWet = document.getElementById("wet").value === "yes";
       const isGold = document.getElementById("gold").value === "yes";
+      const isMoonlit = document.getElementById("moonlit").value === "yes";
 
-      if (isNaN(weight)) {
+      if (isNaN(weight) || weight <= 0) {
         document.getElementById("price").innerText = "Please enter a valid weight.";
         return;
       }
 
-      let basePricePerKg = isWet ? 100 : 63;
-      if (isGold) basePricePerKg = 2740;
+      let basePricePerKg = 0;
+
+      if (fruit === "strawberry") {
+        basePricePerKg = isWet ? 100 : 63;
+        if (isGold) basePricePerKg = 2740;
+      } else if (fruit === "dragon") {
+        basePricePerKg = isWet ? 200 : 120;
+        if (isGold) basePricePerKg = 3400;
+        if (isMoonlit && isWet) basePricePerKg = 1307;
+      }
 
       const totalPrice = Math.round(weight * basePricePerKg);
       document.getElementById("price").innerText = `Estimated Price: ${totalPrice} cents (${(totalPrice / 100).toFixed(2)} Robux)`;
