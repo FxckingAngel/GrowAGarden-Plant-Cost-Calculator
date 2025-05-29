@@ -71,6 +71,7 @@ legend {
 }
 
   </style>
+
 </head>
 <body>
   <h1>🌱 GrowAGarden Plant Cost Calculator</h1>
@@ -110,104 +111,122 @@ legend {
 
   <div class="output" id="result">💰 Total Value: 0 Sheckles</div>
 
-  <script>
-    const plantBaseValues = {
-      "apple": 248,
-      "banana": 1579,
-      "bamboo": 3610,
-      "beanstalk": 18050,
-      "blood banana": 5415,
-      "blueberry": 18,
-      "cactus": 3068,
-      "cacao": 9928,
-      "carrot": 18,
-      "cherry blossom": 550,
-      "corn": 36,
-      "cranberry": 1805,
-      "coconut": 361,
-      "cursed fruit": 15000,
-      "candy blossom": 93567,
-      "candy sunflower": 145000,
-      "daffodil": 903,
-      "dragonfruit": 4287,
-      "durian": 4513,
-      "eggplant": 6769,
-      "easter egg": 4513,
-      "glowshroom": 175,
-      "grape": 7085,
-      "lemon": 500,
-      "mango": 5866,
-      "mint": 0,
-      "moon mango": 22563,
-      "moon blossom": 45125,
-      "moon melon": 16245,
-      "moonflower": 8500,
-      "moonglow": 18000,
-      "mushroom": 136278,
-      "nightshade": 2000,
-      "orange tulip": 767,
-      "papaya": 1000,
-      "passionfruit": 3204,
-      "peach": 271,
-      "pear": 500,
-      "pepper": 7220,
-      "pineapple": 1805,
-      "pumpkin": 3700,
-      "raspberry": 90,
-      "soulfruit": 3000,
-      "starfruit": 15538,
-      "strawberry": 14,
-      "tomato": 27,
-      "venus fly trap": 17000,
-      "watermelon": 2708
-    };
+<script>
+  const plantBaseValues = {
+    "apple": 248,
+    "banana": 1579,
+    "bamboo": 3610,
+    "beanstalk": 18050,
+    "blood banana": 5415,
+    "blueberry": 18,
+    "cactus": 3068,
+    "cacao": 9928,
+    "carrot": 18,
+    "cherry blossom": 550,
+    "corn": 36,
+    "cranberry": 1805,
+    "coconut": 361,
+    "cursed fruit": 15000,
+    "candy blossom": 93567,
+    "candy sunflower": 145000,
+    "daffodil": 903,
+    "dragonfruit": 4287,
+    "durian": 4513,
+    "eggplant": 6769,
+    "easter egg": 4513,
+    "glowshroom": 175,
+    "grape": 7085,
+    "lemon": 500,
+    "mango": 5866,
+    "mint": 0,
+    "moon mango": 22563,
+    "moon blossom": 45125,
+    "moon melon": 16245,
+    "moonflower": 8500,
+    "moonglow": 18000,
+    "mushroom": 136278,
+    "nightshade": 2000,
+    "orange tulip": 767,
+    "papaya": 1000,
+    "passionfruit": 3204,
+    "peach": 271,
+    "pear": 500,
+    "pepper": 7220,
+    "pineapple": 1805,
+    "pumpkin": 3700,
+    "raspberry": 90,
+    "soulfruit": 3000,
+    "starfruit": 15538,
+    "strawberry": 14,
+    "tomato": 27,
+    "venus fly trap": 17000,
+    "watermelon": 2708
+  };
 
-    const plantSelect = document.getElementById("plant");
-    Object.keys(plantBaseValues).sort().forEach(p => {
-      const option = document.createElement("option");
-      option.value = p;
-      option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
-      plantSelect.appendChild(option);
-    });
+  const stackValues = {
+    "Wet 💧": 0.1,
+    "Chilled ❄️": 0.1,
+    "Chocolate 🍫": 0.15,
+    "Moonlit 🌙": 0.2,
+    "Bloodlit 🔥": 0.2,
+    "Plasma ⚡": 0.3,
+    "Frozen 🧊": 0.4,
+    "Zombified 🧟": 0.2,
+    "Twisted 🌀": 0.25,
+    "Rainbow 🌈": 0.5,
+    "Shocked ⚡": 0.2,
+    "Celestial 🌌": 0.35,
+    "Disco 🕺": 0.15
+  };
 
-    const mutationSelect = document.getElementById("mutation");
-    const envCheckboxes = document.querySelectorAll(".env-label input");
-    const weightInput = document.getElementById("weight");
+  const plantSelect = document.getElementById("plant");
+  Object.keys(plantBaseValues).sort().forEach(p => {
+    const option = document.createElement("option");
+    option.value = p;
+    option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+    plantSelect.appendChild(option);
+  });
 
-    document.querySelectorAll("#plant, #mutation, #weight").forEach(el => {
-      el.addEventListener("input", updateValue);
-    });
-    envCheckboxes.forEach(cb => cb.addEventListener("input", updateValue));
+  const mutationSelect = document.getElementById("mutation");
+  const weightInput = document.getElementById("weight");
+  const envCheckboxes = document.querySelectorAll(".stack-item input");
 
-    function updateValue() {
-      const plant = plantSelect.value;
-      const base = plantBaseValues[plant] || 0;
-      const growth = parseFloat(mutationSelect.value || 1);
-      const weight = parseFloat(weightInput.value || 1);
+  document.querySelectorAll("#plant, #mutation, #weight").forEach(el => {
+    el.addEventListener("input", updateValue);
+  });
+  envCheckboxes.forEach(cb => cb.addEventListener("input", updateValue));
 
-      let stack = 0;
-      let wet = false, chilled = false, frozen = false;
+  function updateValue() {
+    const plant = plantSelect.value;
+    const base = plantBaseValues[plant] || 0;
+    const growth = parseFloat(mutationSelect.value || 1);
+    const weight = parseFloat(weightInput.value || 1);
 
-      envCheckboxes.forEach(cb => {
-        if (cb.checked) {
-          const label = cb.parentElement.textContent;
-          if (label.includes("Wet")) wet = true;
-          if (label.includes("Chilled")) chilled = true;
-          if (label.includes("Frozen")) frozen = true;
-          stack += parseInt(cb.value);
-        }
-      });
+    let wet = false, chilled = false, frozen = false;
+    let stackMultiplier = 0;
 
-      if (frozen) {
-        if (wet) stack -= 1;
-        if (chilled) stack -= 1;
-      } else if (wet && chilled) {
-        stack -= 1; // remove chilled if both wet and chilled are checked
+    envCheckboxes.forEach(cb => {
+      if (cb.checked) {
+        const label = cb.value;
+        if (label.includes("Wet")) wet = true;
+        if (label.includes("Chilled")) chilled = true;
+        if (label.includes("Frozen")) frozen = true;
+        stackMultiplier += stackValues[label] || 0;
       }
+    });
 
-      const total = Math.round(base * (1 + stack) * growth * weight);
-      document.getElementById("result").textContent = `💰 Total Value: ${total.toLocaleString()} Sheckles`;
+    // Special environmental interaction logic
+    if (frozen) {
+      if (wet) stackMultiplier -= (stackValues["Wet 💧"] || 0);
+      if (chilled) stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
+    } else if (wet && chilled) {
+      stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
     }
-  </script>
+
+    const total = Math.round(base * (1 + stackMultiplier) * growth * weight);
+    document.getElementById("result").textContent = `💰 Total Value: ${total.toLocaleString()} Sheckles`;
+  }
+</script>
+
 </body>
 </html>
