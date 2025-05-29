@@ -29,50 +29,42 @@
       font-size: 1.5rem;
       color: #90ee90;
     }
-fieldset {
-  border: 1px solid #444;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  background-color: #111;
-  color: #eee;
-}
-
-legend {
-  font-weight: bold;
-  font-size: 1.1rem;
-  padding: 0 0.5rem;
-  color: #7cf79e;
-}
-
-.stack-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.stack-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #1a1a1a;
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-
-.stack-item:hover {
-  background: #2a2a2a;
-}
-
-.stack-item input {
-  transform: scale(1.2);
-}
-
+    fieldset {
+      border: 1px solid #444;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      background-color: #111;
+      color: #eee;
+    }
+    legend {
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 0 0.5rem;
+      color: #7cf79e;
+    }
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .stack-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #1a1a1a;
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .stack-item:hover {
+      background: #2a2a2a;
+    }
+    .stack-item input {
+      transform: scale(1.2);
+    }
   </style>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
   <h1>🌱 GrowAGarden Plant Cost Calculator</h1>
@@ -87,173 +79,114 @@ legend {
     <option value="50">Rainbow 🌈</option>
   </select>
 
-<fieldset>
-  <legend>🌐 Environmental Stacks</legend>
-  <div class="stack-grid">
-    <label class="stack-item"><input type="checkbox" value="Wet 💧" /> Wet 💧</label>
-    <label class="stack-item"><input type="checkbox" value="Chilled ❄️" /> Chilled ❄️</label>
-    <label class="stack-item"><input type="checkbox" value="Chocolate 🍫" /> Chocolate 🍫</label>
-    <label class="stack-item"><input type="checkbox" value="Moonlit 🌙" /> Moonlit 🌙</label>
-    <label class="stack-item"><input type="checkbox" value="Bloodlit 🔥" /> Bloodlit 🔥</label>
-    <label class="stack-item"><input type="checkbox" value="Plasma ⚡" /> Plasma ⚡</label>
-    <label class="stack-item"><input type="checkbox" value="Frozen 🧊" /> Frozen 🧊</label>
-    <label class="stack-item"><input type="checkbox" value="Zombified 🧟" /> Zombified 🧟</label>
-    <label class="stack-item"><input type="checkbox" value="Twisted 🌀" /> Twisted 🌀</label>
-    <label class="stack-item"><input type="checkbox" value="Rainbow 🌈" /> Rainbow 🌈</label>
-    <label class="stack-item"><input type="checkbox" value="Shocked ⚡" /> Shocked ⚡</label>
-    <label class="stack-item"><input type="checkbox" value="Celestial 🌌" /> Celestial 🌌</label>
-    <label class="stack-item"><input type="checkbox" value="Disco 🕺" /> Disco 🕺</label>
-  </div>
-</fieldset>
-
+  <fieldset>
+    <legend>🌐 Environmental Stacks</legend>
+    <div class="stack-grid">
+      <label class="stack-item"><input type="checkbox" value="Wet 💧" /> Wet 💧</label>
+      <label class="stack-item"><input type="checkbox" value="Chilled ❄️" /> Chilled ❄️</label>
+      <label class="stack-item"><input type="checkbox" value="Chocolate 🍫" /> Chocolate 🍫</label>
+      <label class="stack-item"><input type="checkbox" value="Moonlit 🌙" /> Moonlit 🌙</label>
+      <label class="stack-item"><input type="checkbox" value="Bloodlit 🔥" /> Bloodlit 🔥</label>
+      <label class="stack-item"><input type="checkbox" value="Plasma ⚡" /> Plasma ⚡</label>
+      <label class="stack-item"><input type="checkbox" value="Frozen 🧊" /> Frozen 🧊</label>
+      <label class="stack-item"><input type="checkbox" value="Zombified 🧟" /> Zombified 🧟</label>
+      <label class="stack-item"><input type="checkbox" value="Twisted 🌀" /> Twisted 🌀</label>
+      <label class="stack-item"><input type="checkbox" value="Rainbow 🌈" /> Rainbow 🌈</label>
+      <label class="stack-item"><input type="checkbox" value="Shocked ⚡" /> Shocked ⚡</label>
+      <label class="stack-item"><input type="checkbox" value="Celestial 🌌" /> Celestial 🌌</label>
+      <label class="stack-item"><input type="checkbox" value="Disco 🕺" /> Disco 🕺</label>
+    </div>
+  </fieldset>
 
   <label for="weight">⚖️ Input Weight (kg)</label>
   <input type="number" id="weight" placeholder="e.g. 0.17" step="0.01" />
 
-  <div class="output" id="result">💰 Total Value: 0 Sheckles</div>
-<div id="reportForm">
-    <h2>📢 Report Wrong Price</h2>
-    <input type="text" id="userPlantName" placeholder="Plant name" />
-    <textarea id="userReason" rows="3" placeholder="Why is it wrong?"></textarea>
-    <button id="submitReport">Submit Report</button>
-  </div>
+  <div class="output" id="result">💰 Total Value: 0 Sheckles</div><div class="output" id="result">💰 Total Value: 0 Sheckles</div>
+  <div class="output" id="formula" style="font-size:1rem; color:#aaa; margin-top:0.5rem;"></div>
 
-  <div id="adminPanel">
-    <h2>🔒 Admin View</h2>
-    <input type="password" id="adminPassword" placeholder="Enter admin password" />
-    <button id="viewReports">View Reports</button>
-    <ul id="wrongList"></ul>
-  </div>
-<script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
-      authDomain: "growagardenplantcostcalculator.firebaseapp.com",
-      databaseURL: "https://growagardenplantcostcalculator-default-rtdb.firebaseio.com",
-      projectId: "growagardenplantcostcalculator",
-      storageBucket: "growagardenplantcostcalculator.firebasestorage.app",
-      messagingSenderId: "410113480248",
-      appId: "1:410113480248:web:72badb81206b458ecd38cd",
-      measurementId: "G-K7XD9NMRGZ"
+  <script>
+    const plantBaseValues = {
+      "apple": 248, "banana": 1579, "bamboo": 3610, "beanstalk": 18050,
+      "blood banana": 5415, "blueberry": 18, "cactus": 3068, "cacao": 9928,
+      "carrot": 18, "cherry blossom": 550, "corn": 36, "cranberry": 1805,
+      "coconut": 361, "cursed fruit": 15000, "candy blossom": 93567,
+      "candy sunflower": 145000, "daffodil": 903, "dragonfruit": 4287,
+      "durian": 4513, "eggplant": 6769, "easter egg": 4513, "glowshroom": 175,
+      "grape": 7085, "lemon": 500, "mango": 5866, "mint": 0,
+      "moon mango": 22563, "moon blossom": 45125, "moon melon": 16245,
+      "moonflower": 8500, "moonglow": 18000, "mushroom": 136278,
+      "nightshade": 2000, "orange tulip": 767, "papaya": 1000,
+      "passionfruit": 3204, "peach": 271, "pear": 500, "pepper": 7220,
+      "pineapple": 1805, "pumpkin": 3700, "raspberry": 90, "soulfruit": 3000,
+      "starfruit": 15538, "strawberry": 14, "tomato": 27,
+      "venus fly trap": 17000, "watermelon": 2708
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-{
-  "apple": 30.5250,
-  "banana": 777.7778,
-  "bamboo": 250.0000,
-  "beanstalk": 200.0000,
-  "blood banana": 5415,
-  "blueberry": 500.0000,
-  "cactus": 69.3850,
-  "cacao": 171.8750,
-  "carrot": 265.0000,
-  "cherry blossom": 550,
-  "corn": 10.0000,
-  "cranberry": 2000.0000,
-  "coconut": 2.0400,
-  "cursed fruit": 15000,
-  "candy blossom": 11570.0000,
-  "candy sunflower": 145000,
-  "daffodil": 25000.0000,
-  "dragonfruit": 32.9750,
-  "durian": 78.1250,
-  "eggplant": 300.0000,
-  "easter egg": 277.8750,
-  "glowshroom": 175,
-  "grape": 872.3250,
-  "lemon": 500,
-  "mango": 29.0725,
-  "mint": 5250.0000,
-  "moon mango": 22563,
-  "moon blossom": 45125,
-  "moon melon": 16245,
-  "moonflower": 2375.0000,
-  "moonglow": 18000,
-  "mushroom": 241.6000,
-  "nightshade": 2000,
-  "orange tulip": 340000.0000,
-  "papaya": 1000,
-  "passionfruit": 394.5000,
-  "peach": 75.0000,
-  "pear": 500,
-  "pepper": 320.0000,
-  "pineapple": 1805,
-  "pumpkin": 3700,
-  "raspberry": 178.0000,
-  "soulfruit": 3000,
-  "starfruit": 15538,
-  "strawberry": 170.0000,
-  "tomato": 120.0000,
-  "venus fly trap": 17000,
-  "watermelon": 2708
-}
+    const stackValues = {
+      "Wet 💧": 0.1, "Chilled ❄️": 0.1, "Chocolate 🍫": 0.15,
+      "Moonlit 🌙": 0.2, "Bloodlit 🔥": 0.2, "Plasma ⚡": 0.3,
+      "Frozen 🧊": 0.4, "Zombified 🧟": 0.2, "Twisted 🌀": 0.25,
+      "Rainbow 🌈": 0.5, "Shocked ⚡": 0.2, "Celestial 🌌": 0.35,
+      "Disco 🕺": 0.15
+    };
 
-
-  const stackValues = {
-    "Wet 💧": 0.1,
-    "Chilled ❄️": 0.1,
-    "Chocolate 🍫": 0.15,
-    "Moonlit 🌙": 0.2,
-    "Bloodlit 🔥": 0.2,
-    "Plasma ⚡": 0.3,
-    "Frozen 🧊": 0.4,
-    "Zombified 🧟": 0.2,
-    "Twisted 🌀": 0.25,
-    "Rainbow 🌈": 0.5,
-    "Shocked ⚡": 0.2,
-    "Celestial 🌌": 0.35,
-    "Disco 🕺": 0.15
-  };
-
-  const plantSelect = document.getElementById("plant");
-  Object.keys(plantBaseValues).sort().forEach(p => {
-    const option = document.createElement("option");
-    option.value = p;
-    option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
-    plantSelect.appendChild(option);
-  });
-
-  const mutationSelect = document.getElementById("mutation");
-  const weightInput = document.getElementById("weight");
-  const envCheckboxes = document.querySelectorAll(".stack-item input");
-
-  document.querySelectorAll("#plant, #mutation, #weight").forEach(el => {
-    el.addEventListener("input", updateValue);
-  });
-  envCheckboxes.forEach(cb => cb.addEventListener("input", updateValue));
-
-  function updateValue() {
-    const plant = plantSelect.value;
-    const base = plantBaseValues[plant] || 0;
-    const growth = parseFloat(mutationSelect.value || 1);
-    const weight = parseFloat(weightInput.value || 1);
-
-    let wet = false, chilled = false, frozen = false;
-    let stackMultiplier = 0;
-
-    envCheckboxes.forEach(cb => {
-      if (cb.checked) {
-        const label = cb.value;
-        if (label.includes("Wet")) wet = true;
-        if (label.includes("Chilled")) chilled = true;
-        if (label.includes("Frozen")) frozen = true;
-        stackMultiplier += stackValues[label] || 0;
-      }
+    const plantSelect = document.getElementById("plant");
+    Object.keys(plantBaseValues).sort().forEach(p => {
+      const option = document.createElement("option");
+      option.value = p;
+      option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+      plantSelect.appendChild(option);
     });
 
-    // Special environmental interaction logic
-    if (frozen) {
-      if (wet) stackMultiplier -= (stackValues["Wet 💧"] || 0);
-      if (chilled) stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
-    } else if (wet && chilled) {
-      stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
+    const mutationSelect = document.getElementById("mutation");
+    const weightInput = document.getElementById("weight");
+    const envCheckboxes = document.querySelectorAll(".stack-item input");
+
+    document.querySelectorAll("#plant, #mutation, #weight").forEach(el => {
+      el.addEventListener("input", updateValue);
+    });
+    envCheckboxes.forEach(cb => cb.addEventListener("input", updateValue));
+
+    function updateValue() {
+  const plant = plantSelect.value;
+  const base = plantBaseValues[plant] || 0;
+  const growth = parseFloat(mutationSelect.value || 1);
+  const weight = parseFloat(weightInput.value || 1);
+
+  let wet = false, chilled = false, frozen = false;
+  let stackMultiplier = 0;
+
+  envCheckboxes.forEach(cb => {
+    if (cb.checked) {
+      const label = cb.value;
+      if (label.includes("Wet")) wet = true;
+      if (label.includes("Chilled")) chilled = true;
+      if (label.includes("Frozen")) frozen = true;
+      stackMultiplier += stackValues[label] || 0;
     }
+  });
 
-    const total = Math.round(base * (1 + stackMultiplier) * growth * weight);
-    document.getElementById("result").textContent = `💰 Total Value: ${total.toLocaleString()} Sheckles`;
+  // Special environmental interaction logic
+  if (frozen) {
+    if (wet) stackMultiplier -= (stackValues["Wet 💧"] || 0);
+    if (chilled) stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
+  } else if (wet && chilled) {
+    stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
   }
-</script>
 
+  const total = Math.round(base * (1 + stackMultiplier) * growth * weight);
+  document.getElementById("result").textContent = `💰 Total Value: ${total.toLocaleString()} Sheckles`;
+
+  // Show formula with current values
+  const formulaText = `
+    Formula: Total = Base × (1 + Stack Multiplier) × Growth Mutation × Weight
+    <br/>
+    Total = ${base.toFixed(4)} × (1 + ${stackMultiplier.toFixed(4)}) × ${growth.toFixed(4)} × ${weight.toFixed(4)}
+    <br/>
+    Total = ${total.toLocaleString()} Sheckles
+  `;
+  document.getElementById("formula").innerHTML = formulaText;
+}
+  </script>
 </body>
 </html>
