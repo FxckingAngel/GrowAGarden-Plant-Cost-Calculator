@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GrowAGarden Calculator</title>
+  <title>🌱 GrowAGarden Calculator</title>
   <style>
     body {
       background: #e6f9ee;
@@ -24,7 +24,7 @@
       padding: 1.5em;
       border-radius: 1em;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      max-width: 400px;
+      max-width: 450px;
       width: 100%;
     }
 
@@ -66,23 +66,69 @@
 <body>
   <h1>🌱 GrowAGarden Calculator</h1>
   <div class="calculator">
-    <label for="fruit">Fruit Type</label>
-    <select id="fruit"></select>
+    <label for="fruit">🌿 Plant Type</label>
+    <select id="fruit">
+      <option>Apple</option>
+      <option>Banana</option>
+      <option>Beanstalk</option>
+      <option>Blueberry</option>
+      <option>Bamboo</option>
+      <option>Cacao</option>
+      <option>Cactus</option>
+      <option>Carrot</option>
+      <option>Celestlberry</option>
+      <option>Coconut</option>
+      <option>Corn</option>
+      <option>Cranberry</option>
+      <option>Daffodil</option>
+      <option>Dragonfruit</option>
+      <option>Durian</option>
+      <option>Eggplant</option>
+      <option>Grape</option>
+      <option>Mango</option>
+      <option>Moonflower</option>
+      <option>Mushroom</option>
+      <option>OrangeTulip</option>
+      <option>Papaya</option>
+      <option>Passionfruit</option>
+      <option>Peach</option>
+      <option>Pear</option>
+      <option>Pepper</option>
+      <option>Pumpkin</option>
+      <option>Raspberry</option>
+      <option>Soulfruit</option>
+      <option>Strawberry</option>
+      <option>Tomato</option>
+      <option>Watermelon</option>
+    </select>
 
-    <label for="weight">Weight (kg)</label>
+    <label for="weight">⚖️ Weight (kg)</label>
     <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42">
 
-    <label for="modifiers">Modifiers</label>
-    <select id="modifiers" multiple></select>
+    <label for="modifiers">✨ Modifiers (Hold Ctrl or ⌘ to select multiple)</label>
+    <select id="modifiers" multiple>
+      <option>🌈 Rainbow</option>
+      <option>🥇 Gold</option>
+      <option>⚡ Shocked</option>
+      <option>❄️ Frozen</option>
+      <option>💧 Wet</option>
+      <option>🥶 Chilled</option>
+      <option>🍫 Choc</option>
+      <option>🌙 Moonlit</option>
+      <option>🩸 Bloodlit</option>
+      <option>🌟 Celestial</option>
+      <option>🎉 Disco</option>
+      <option>🧟 Zomb</option>
+      <option>🔋 Plasma</option>
+    </select>
 
-    <button onclick="calculatePrice()">💰 Calculate</button>
+    <button onclick="calculate()">💰 Calculate</button>
     <div class="result" id="price">Estimated Price: —</div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getDatabase, ref, get, child, set } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
-
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
       authDomain: "growagardenplantcostcalculator.firebaseapp.com",
@@ -94,57 +140,77 @@
       measurementId: "G-K7XD9NMRGZ"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    const fruits = ["Carrot", "Strawberry", "Blueberry", "Orangetulip", "Tomato", "Corn", "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut", "Cactus", "Dragonfruit", "Mango", "Grape", "Mushroom", "Pepper", "Cacao", "Beanstalk", "Raspberry", "Pear", "Peach", "Cranberry", "Durian", "Eggplant", "Papaya", "Banana", "Passionfruit", "Soulfruit"];
-    const modifiers = ["Rainbow", "Gold", "Shocked", "Frozen", "Wet", "Chilled", "Choc", "Moonlit", "Bloodlit", "Celestial", "Disco", "Zomb", "Plasma"];
+    const baseModifierWeights = {
+      "🌈 Rainbow": 3.2,
+      "🥇 Gold": 2.3,
+      "⚡ Shocked": 5.5,
+      "❄️ Frozen": 4.5,
+      "💧 Wet": 1.6,
+      "🥶 Chilled": 1.9,
+      "🍫 Choc": 3.0,
+      "🌙 Moonlit": 2.5,
+      "🩸 Bloodlit": 2.2,
+      "🌟 Celestial": 3.6,
+      "🎉 Disco": 4.8,
+      "🧟 Zomb": 2.9,
+      "🔋 Plasma": 3.3
+    };
 
-    const fruitSelect = document.getElementById("fruit");
-    const modSelect = document.getElementById("modifiers");
-
-    fruits.forEach(f => {
-      const option = document.createElement("option");
-      option.value = f.toLowerCase();
-      option.textContent = f;
-      fruitSelect.appendChild(option);
-    });
-
-    modifiers.forEach(m => {
-      const option = document.createElement("option");
-      option.value = m.toLowerCase();
-      option.textContent = m;
-      modSelect.appendChild(option);
-    });
-
-    async function calculatePrice() {
-      const fruit = fruitSelect.value;
+    async function calculate() {
+      const fruit = document.getElementById("fruit").value.toLowerCase();
       const weight = parseFloat(document.getElementById("weight").value);
-      const selectedMods = Array.from(modSelect.selectedOptions).map(o => o.value);
+      const selected = Array.from(document.getElementById("modifiers").selectedOptions).map(opt => opt.value);
+      const stripped = selected.map(label => label.replace(/^[^ ]+ /, ''));
 
-      if (!fruit || isNaN(weight) || weight <= 0) {
-        document.getElementById("price").innerText = "❗ Please enter a valid fruit and weight.";
+      if (isNaN(weight) || weight <= 0) {
+        document.getElementById("price").innerText = "❗ Please enter a valid weight.";
         return;
       }
 
-      const key = [
-        ...selectedMods.sort(),
-        fruit,
-        weight.toFixed(2)
-      ].join("|");
+      try {
+        const snap = await db.ref("learnedData").once("value");
+        const data = snap.val();
+        const matches = [];
 
-      const snap = await get(child(ref(db), `prices/${key}`));
-      if (snap.exists()) {
-        const price = snap.val();
-        document.getElementById("price").innerText = `Estimated Price: $${price.toLocaleString()}`;
-      } else {
-        document.getElementById("price").innerText = `❓ Unknown combination. Submitting for review...`;
-        await set(ref(db, `pending/${key}`), {
-          fruit,
-          weight,
-          modifiers: selectedMods,
-          timestamp: Date.now()
-        });
+        for (const key in data) {
+          const entry = data[key];
+          if (!entry || entry.weight <= 0) continue;
+
+          const weightDiff = Math.abs(entry.weight - weight);
+          if (entry.fruit === fruit && weightDiff <= 1.5) {
+            let score = 1;
+            for (const mod of stripped) {
+              if (entry.modifiers.includes(mod)) score += 1.2;
+              else score -= 0.4;
+            }
+            matches.push({
+              pricePerKg: entry.price / entry.weight,
+              score
+            });
+          }
+        }
+
+        let basePricePerKg = 100;
+        if (matches.length > 0) {
+          matches.sort((a, b) => b.score - a.score);
+          basePricePerKg = matches[0].pricePerKg;
+        }
+
+        let multiplier = 1.0;
+        for (const mod of selected) {
+          if (baseModifierWeights[mod]) multiplier *= baseModifierWeights[mod];
+        }
+
+        const finalPrice = Math.round(weight * basePricePerKg * multiplier);
+        document.getElementById("price").innerText =
+          `Estimated Price: ${finalPrice} coins 💰 (${(finalPrice / 100).toFixed(2)} Robux)`;
+
+      } catch (err) {
+        document.getElementById("price").innerText = "❗ Error calculating price.";
+        console.error(err);
       }
     }
   </script>
