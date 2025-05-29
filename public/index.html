@@ -29,6 +29,47 @@
       font-size: 1.5rem;
       color: #90ee90;
     }
+fieldset {
+  border: 1px solid #444;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background-color: #111;
+  color: #eee;
+}
+
+legend {
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding: 0 0.5rem;
+  color: #7cf79e;
+}
+
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.stack-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #1a1a1a;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.stack-item:hover {
+  background: #2a2a2a;
+}
+
+.stack-item input {
+  transform: scale(1.2);
+}
+
   </style>
 </head>
 <body>
@@ -44,22 +85,25 @@
     <option value="50">Rainbow 🌈</option>
   </select>
 
-  <fieldset>
-    <legend>🌍 Environmental Stacks</legend>
-    <label class="env-label"><input type="checkbox" value="1" /> Wet 💧</label>
-    <label class="env-label"><input type="checkbox" value="1" /> Chilled 🤊</label>
-    <label class="env-label"><input type="checkbox" value="1" /> Chocolate 🍫</label>
-    <label class="env-label"><input type="checkbox" value="1" /> Moonlit 🌙</label>
-    <label class="env-label"><input type="checkbox" value="3" /> Bloodlit 🩸</label>
-    <label class="env-label"><input type="checkbox" value="5" /> Plasma ⚡</label>
-    <label class="env-label"><input type="checkbox" value="9" /> Frozen ❄️</label>
-    <label class="env-label"><input type="checkbox" value="24" /> Zombified 🧟‍♂️</label>
-    <label class="env-label"><input type="checkbox" value="30" /> Twisted 🔀</label>
-    <label class="env-label"><input type="checkbox" value="50" /> Rainbow 🌈</label>
-    <label class="env-label"><input type="checkbox" value="99" /> Shocked ⚡</label>
-    <label class="env-label"><input type="checkbox" value="119" /> Celestial ✨</label>
-    <label class="env-label"><input type="checkbox" value="124" /> Disco 💃</label>
-  </fieldset>
+<fieldset>
+  <legend>🌐 Environmental Stacks</legend>
+  <div class="stack-grid">
+    <label class="stack-item"><input type="checkbox" value="Wet 💧" /> Wet 💧</label>
+    <label class="stack-item"><input type="checkbox" value="Chilled ❄️" /> Chilled ❄️</label>
+    <label class="stack-item"><input type="checkbox" value="Chocolate 🍫" /> Chocolate 🍫</label>
+    <label class="stack-item"><input type="checkbox" value="Moonlit 🌙" /> Moonlit 🌙</label>
+    <label class="stack-item"><input type="checkbox" value="Bloodlit 🔥" /> Bloodlit 🔥</label>
+    <label class="stack-item"><input type="checkbox" value="Plasma ⚡" /> Plasma ⚡</label>
+    <label class="stack-item"><input type="checkbox" value="Frozen 🧊" /> Frozen 🧊</label>
+    <label class="stack-item"><input type="checkbox" value="Zombified 🧟" /> Zombified 🧟</label>
+    <label class="stack-item"><input type="checkbox" value="Twisted 🌀" /> Twisted 🌀</label>
+    <label class="stack-item"><input type="checkbox" value="Rainbow 🌈" /> Rainbow 🌈</label>
+    <label class="stack-item"><input type="checkbox" value="Shocked ⚡" /> Shocked ⚡</label>
+    <label class="stack-item"><input type="checkbox" value="Celestial 🌌" /> Celestial 🌌</label>
+    <label class="stack-item"><input type="checkbox" value="Disco 🕺" /> Disco 🕺</label>
+  </div>
+</fieldset>
+
 
   <label for="weight">⚖️ Input Weight (kg)</label>
   <input type="number" id="weight" placeholder="e.g. 0.17" step="0.01" />
