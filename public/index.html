@@ -1,53 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>GrowAGarden Plant Cost Calculator</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="firebase.js"></script>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GrowAGarden Price Calculator</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 2rem; max-width: 400px; margin: auto; }
+  label, select, input, button { display: block; margin-bottom: 1rem; width: 100%; }
+  select[multiple] { height: 120px; }
+</style>
 </head>
 <body>
-  <h1>🌱 GrowAGarden Plant Cost Calculator</h1>
 
-  <div id="calculator">
-    <label for="plant">Choose a plant:</label>
-    <select id="plant"></select>
+<h2>Plant Cost Calculator</h2>
 
-    <label for="weight">Weight (grams):</label>
-    <input type="number" id="weight" min="1">
+<label for="plant-select">Select Plant:</label>
+<select id="plant-select">
+  <!-- JS fills options -->
+</select>
 
-    <label for="modifier">Modifier:</label>
-    <select id="modifier">
-      <option value="none">None</option>
-      <option value="organic">Organic</option>
-      <option value="rare">Rare</option>
-    </select>
+<label for="modifier-select">Select Modifiers (Ctrl+Click to multi-select):</label>
+<select id="modifier-select" multiple>
+  <!-- JS fills options -->
+</select>
 
-    <button onclick="calculatePrice()">Calculate</button>
-    <div id="result"></div>
+<label for="weight-input">Weight (kg):</label>
+<input type="number" id="weight-input" step="0.01" min="0" value="1" />
 
-    <div id="correction">
-      <h3>Submit a Correction</h3>
-      <input type="number" id="correctedPrice" placeholder="Correct price">
-      <button onclick="submitCorrection()">Submit Correction</button>
-      <p id="correctionStatus"></p>
-    </div>
-  </div>
+<button id="calc-btn">Calculate Price</button>
 
-  <hr>
+<h3>Price: <span id="price-output">-</span></h3>
 
-  <div id="adminLogin">
-    <h3>Admin Login</h3>
-    <input type="password" id="adminPass" placeholder="Enter admin password">
-    <button onclick="checkAdmin()">Enter Dashboard</button>
-  </div>
+<script>
+  // Paste the startingData, plantsList, modifiersList, arraysEqual, calculatePrice here
 
-  <div id="adminPanel" style="display:none;">
-    <h2>Admin Dashboard</h2>
-    <canvas id="trendChart" width="400" height="200"></canvas>
-  </div>
+  // Starting data
+  const startingData = [
+    { modifiers: ['frozen'], plant: 'strawberry', weight: 0.25, price: 135 },
+    { modifiers: ['moonlit'], plant: 'dragonfruit', weight: 1, price: 12861 },
+    { modifiers: ['wet'], plant: 'strawberry', weight: 0.26, price: 27 },
+    { modifiers: [], plant: 'strawberry', weight: 0.23, price: 14 },
+    { modifiers: ['wet'], plant: 'dragonfruit', weight: 12.56, price: 10414 },
+    { modifiers: [], plant: 'celestlberry', weight: 2.13, price: 9040 },
+    { modifiers: ['wet'], plant: 'celestlberry', weight: 2.30, price: 21123 },
+    { modifiers: ['shocked'], plant: 'coconut', weight: 18.72, price: 71503 },
+    { modifiers: ['wet', 'shocked'], plant: 'coconut', weight: 15.88, price: 51953 },
+    { modifiers: ['wet', 'gold'], plant: 'coconut', weight: 18.83, price: 28944 },
+    { modifiers: [], plant: 'durian', weight: 46.20, price: 166789 },
+    { modifiers: ['disco', 'wet'], plant: 'cranberry', weight: 1.24, price: 384357 },
+    { modifiers: ['wet'], plant: 'glowshroom', weight: 0.73, price: 574 },
+    { modifiers: ['wet'], plant: 'moonflower', weight: 2.11, price: 21147 },
+    { modifiers: ['frozen', 'shocked'], plant: 'mushroom', weight: 1, price: 14854248 },
+    { modifiers: ['wet'], plant: 'beanstalk', weight: 12.86, price: 66152 },
+    { modifiers: ['wet'], plant: 'mango', weight: 17.50, price: 17705 },
+    { modifiers: ['wet'], plant: 'blueberry', weight: 0.22, price: 49 },
+    { modifiers: ['wet', 'gold'], plant: 'blueberry', weight: 0.27, price: 1471 },
+    { modifiers: ['wet'], plant: 'blood banana', weight: 1.95, price: 20374 },
+    { modifiers: [], plant: 'blood banana', weight: 2.09, price: 11676 },
+    { modifiers: ['wet'], plant: 'corn', weight: 2.49, price: 124 },
+    { modifiers: ['wet'], plant: 'apple', weight: 3.36, price: 691 },
+    { modifiers: ['wet'], plant: 'tomato', weight: 0.67, price: 109 },
+    { modifiers: ['bloodlit', 'wet'], plant: 'durian', weight: 8.48, price: 28090 },
+    { modifiers: ['celestial', 'wet'], plant: 'durian', weight: 8.81, price: 733382 },
+    { modifiers: [], plant: 'tomato', weight: 0.68, price: 56 },
+    { modifiers: ['choc', 'wet', 'shocked'], plant: 'mushroom', weight: 1, price: 13900305 },
+  ];
 
-  <script type="module" src="app.js"></script>
+  const modifiersList = [
+    "rainbow", "gold", "shocked", "frozen", "wet", "chilled", "choc",
+    "moonlit", "bloodlit", "celestial", "disco", "zomb", "plasma"
+  ];
+
+  const plantsList = [
+    "Apple", "Bamboo", "Banana", "Beanstalk", "Blueberry", "Cactus", "Cacao",
+    "Carrot", "Celestlberry", "Coconut", "Corn", "Cranberry", "Daffodil",
+    "Dragonfruit", "Durian", "Eggplant", "Grape", "Glowshroom", "Mango",
+    "Moonflower", "Mushroom", "Orangetulip", "Papaya", "Passionfruit", "Peach",
+    "Pear", "Pepper", "Pumpkin", "Raspberry", "Soulfruit", "Strawberry", "Tomato",
+    "Watermelon"
+  ];
+
+  // Fill plant select options
+  const plantSelect = document.getElementById('plant-select');
+  plantsList.forEach(plant => {
+    const option = document.createElement('option');
+    option.value = plant.toLowerCase();
+    option.textContent = plant;
+    plantSelect.appendChild(option);
+  });
+
+  // Fill modifier select options
+  const modifierSelect = document.getElementById('modifier-select');
+  modifiersList.forEach(mod => {
+    const option = document.createElement('option');
+    option.value = mod;
+    option.textContent = mod.charAt(0).toUpperCase() + mod.slice(1);
+    modifierSelect.appendChild(option);
+  });
+
+  function arraysEqual(a, b) {
+    if (a.length !== b.length) return false;
+    for(let i = 0; i < a.length; i++) if(a[i] !== b[i]) return false;
+    return true;
+  }
+
+  function calculatePrice(selectedPlant, selectedModifiers, inputWeight) {
+    const plant = selectedPlant.toLowerCase();
+    const modifiers = selectedModifiers.map(m => m.toLowerCase()).sort();
+
+    // Try exact match first
+    for (const entry of startingData) {
+      if (
+        entry.plant.toLowerCase() === plant &&
+        arraysEqual(entry.modifiers.slice().sort(), modifiers) &&
+        Math.abs(entry.weight - inputWeight) < 0.001
+      ) {
+        return entry.price;
+      }
+    }
+
+    // No exact match, try interpolation
+    const filtered = startingData.filter(entry =>
+      entry.plant.toLowerCase() === plant &&
+      arraysEqual(entry.modifiers.slice().sort(), modifiers)
+    );
+
+    if (filtered.length === 0) {
+      return null; // no data for combo
+    }
+
+    filtered.sort((a,b) => Math.abs(a.weight - inputWeight) - Math.abs(b.weight - inputWeight));
+    const closest = filtered[0];
+
+    const pricePerKg = closest.price / closest.weight;
+    return +(pricePerKg * inputWeight).toFixed(2);
+  }
+
+  document.getElementById('calc-btn').addEventListener('click', () => {
+    const plant = plantSelect.value;
+    const selectedModifiers = Array.from(modifierSelect.selectedOptions).map(o => o.value);
+    const weight = parseFloat(document.getElementById('weight-input').value);
+
+    if (!plant || !weight || weight <= 0) {
+      alert('Please select a plant and enter a valid weight');
+      return;
+    }
+
+    const price = calculatePrice(plant, selectedModifiers, weight);
+    document.getElementById('price-output').textContent = price === null ? 'No data for selection' : `$${price.toLocaleString()}`;
+  });
+</script>
+
 </body>
 </html>
