@@ -1,120 +1,182 @@
-import { useState, useEffect } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GrowAGarden Plant Cost Calculator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f4f7f9;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+    label, select, input {
+      display: block;
+      margin: 0.5rem 0;
+    }
+    .section {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .warning {
+      color: #a00;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    .result {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>GrowAGarden Plant Cost Calculator</h1>
 
-const mutationMultipliers = {
-  Golden: 20,
-  Rainbow: 50,
-  None: 1,
-};
+  <div class="section">
+    <label for="plant">Plant Type:</label>
+    <select id="plant">
+    <option value="apple">Apple</option>
+    <option value="banana">Banana</option>
+    <option value="bamboo">Bamboo</option>
+    <option value="beanstalk">Beanstalk</option>
+    <option value="blood banana">Blood Banana</option>
+    <option value="blueberry">Blueberry</option>
+    <option value="cactus">Cactus</option>
+    <option value="cacao">Cacao</option>
+    <option value="carrot">Carrot</option>
+    <option value="corn">Corn</option>
+    <option value="cranberry">Cranberry</option>
+    <option value="coconut">Coconut</option>
+    <option value="daffodil">Daffodil</option>
+    <option value="dragonfruit">Dragonfruit</option>
+    <option value="durian">Durian</option>
+    <option value="eggplant">Eggplant</option>
+    <option value="glowshroom">Glowshroom</option>
+    <option value="grape">Grape</option>
+    <option value="mango">Mango</option>
+    <option value="moon blossom">Moon Blossom</option>
+    <option value="moon melon">Moon Melon</option>
+    <option value="moonflower">Moonflower</option>
+    <option value="mushroom">Mushroom</option>
+    <option value="nightshade">Nightshade</option>
+    <option value="orangetulip">Orange Tulip</option>
+    <option value="papaya">Papaya</option>
+    <option value="passionfruit">Passionfruit</option>
+    <option value="pear">Pear</option>
+    <option value="peach">Peach</option>
+    <option value="pepper">Pepper</option>
+    <option value="pumpkin">Pumpkin</option>
+    <option value="raspberry">Raspberry</option>
+    <option value="soulfruit">Soulfruit</option>
+    <option value="strawberry">Strawberry</option>
+    <option value="tomato">Tomato</option>
+    <option value="watermelon">Watermelon</option>
+    </select>
 
-const environmentStacks = {
-  Shocked: 99,
-  Frozen: 9,
-  Wet: 1,
-  Chilled: 1,
-  Chocolate: 1,
-  Moonlit: 1,
-  Disco: 124,
-  Celestial: 119,
-  Bloodlit: 3,
-  Zombified: 24,
-  Plasma: 4,
-};
+    <label for="weight">Weight (kg):</label>
+    <input type="number" id="weight" min="0.00001" step="0.1" value="1" />
+  </div>
 
-const restrictedGrowthMutations = ["Golden", "Rainbow"];
-const restrictedEnvironmentals = ["Wet", "Chilled", "Frozen"];
+  <div class="section">
+    <label for="mutation">Growth Mutation:</label>
+    <select id="mutation">
+      <option value="">None</option>
+      <option value="Golden">Golden (×20)</option>
+      <option value="Rainbow">Rainbow (×50)</option>
+    </select>
+  </div>
 
-export default function GrowAGardenCalculator() {
-  const [baseValue, setBaseValue] = useState(1);
-  const [growthMutation, setGrowthMutation] = useState("None");
-  const [selectedStacks, setSelectedStacks] = useState<string[]>([]);
-  const [totalValue, setTotalValue] = useState(0);
-  const [warnings, setWarnings] = useState<string[]>([]);
+  <div class="section">
+    <label>Environmental Effects:</label>
+    <label><input type="checkbox" class="env" value="Shocked" /> Shocked (+99x)</label>
+    <label><input type="checkbox" class="env" value="Frozen" /> Frozen (+9x)</label>
+    <label><input type="checkbox" class="env" value="Wet" /> Wet (+1x)</label>
+    <label><input type="checkbox" class="env" value="Chilled" /> Chilled (+1x)</label>
+    <label><input type="checkbox" class="env" value="Chocolate" /> Chocolate (+1x)</label>
+    <label><input type="checkbox" class="env" value="Moonlit" /> Moonlit (+1x)</label>
+    <label><input type="checkbox" class="env" value="Disco" /> Disco (+124x)</label>
+    <label><input type="checkbox" class="env" value="Celestial" /> Celestial (+119x)</label>
+    <label><input type="checkbox" class="env" value="Bloodlit" /> Bloodlit (+3x)</label>
+    <label><input type="checkbox" class="env" value="Zombified" /> Zombified (+24x)</label>
+    <label><input type="checkbox" class="env" value="Plasma" /> Plasma (+4x)</label>
+  </div>
 
-  useEffect(() => {
-    const multiplier = mutationMultipliers[growthMutation] || 1;
-    const stackSum = selectedStacks.reduce((sum, key) => sum + (environmentStacks[key] || 0), 0);
-    const result = baseValue * multiplier * (1 + stackSum);
-    setTotalValue(result);
-  }, [baseValue, growthMutation, selectedStacks]);
+  <div class="result">Total Value: <span id="totalValue">0</span>x</div>
+  <div class="warning" id="warning"></div>
 
-  useEffect(() => {
-    const newWarnings: string[] = [];
+  <script>
+    const plantSelect = document.getElementById('plant');
+    const weightInput = document.getElementById('weight');
+    const mutationSelect = document.getElementById('mutation');
+    const envCheckboxes = document.querySelectorAll('.env');
+    const totalValueEl = document.getElementById('totalValue');
+    const warningEl = document.getElementById('warning');
 
-    const activeRestrictedEnvironmentals = restrictedEnvironmentals.filter(e => selectedStacks.includes(e));
-    if (activeRestrictedEnvironmentals.length > 1) {
-      newWarnings.push("Only one of Wet, Chilled, or Frozen may be active at a time.");
+    const envValues = {
+      Shocked: 99,
+      Frozen: 9,
+      Wet: 1,
+      Chilled: 1,
+      Chocolate: 1,
+      Moonlit: 1,
+      Disco: 124,
+      Celestial: 119,
+      Bloodlit: 3,
+      Zombified: 24,
+      Plasma: 4
+    };
+
+    function calculateValue() {
+      const baseValue = parseFloat(weightInput.value || 0);
+      let growthMultiplier = 1;
+      const mutation = mutationSelect.value;
+
+      if (mutation === 'Golden') growthMultiplier = 20;
+      else if (mutation === 'Rainbow') growthMultiplier = 50;
+
+      const selectedEnvs = Array.from(envCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+
+      // Restriction logic
+      const hasGolden = mutation === 'Golden';
+      const hasRainbow = mutation === 'Rainbow';
+      const waterEffects = selectedEnvs.filter(v => ['Wet', 'Chilled', 'Frozen'].includes(v));
+
+      let warning = '';
+      if (hasGolden && hasRainbow) {
+        warning = 'Only one of Golden or Rainbow can be selected.';
+      } else if (waterEffects.length > 1) {
+        warning = 'Only one of Wet, Chilled, or Frozen can be selected.';
+      }
+
+      if (warning) {
+        warningEl.textContent = warning;
+        totalValueEl.textContent = '0';
+        return;
+      } else {
+        warningEl.textContent = '';
+      }
+
+      const envSum = selectedEnvs.reduce((sum, key) => sum + (envValues[key] || 0), 0);
+      const total = baseValue * growthMultiplier * (1 + envSum);
+
+      totalValueEl.textContent = total.toLocaleString();
     }
 
-    if (growthMutation === "Golden" && selectedStacks.includes("Rainbow")) {
-      newWarnings.push("You can only apply either Golden or Rainbow, not both.");
-    } else if (growthMutation === "Rainbow" && selectedStacks.includes("Golden")) {
-      newWarnings.push("You can only apply either Golden or Rainbow, not both.");
-    }
+    // Add event listeners
+    [plantSelect, weightInput, mutationSelect].forEach(el => el.addEventListener('input', calculateValue));
+    envCheckboxes.forEach(cb => cb.addEventListener('change', calculateValue));
 
-    setWarnings(newWarnings);
-  }, [growthMutation, selectedStacks]);
-
-  const toggleStack = (key: string) => {
-    setSelectedStacks(prev =>
-      prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]
-    );
-  };
-
-  return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">GrowAGarden Plant Cost Calculator</h1>
-
-      <div className="mb-4">
-        <label className="block mb-1 font-medium">Base Value:</label>
-        <input
-          type="number"
-          value={baseValue}
-          onChange={(e) => setBaseValue(Number(e.target.value))}
-          className="border rounded px-2 py-1 w-full"
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="block mb-1 font-medium">Growth Mutation:</label>
-        <select
-          value={growthMutation}
-          onChange={(e) => setGrowthMutation(e.target.value)}
-          className="border rounded px-2 py-1 w-full"
-        >
-          {Object.keys(mutationMultipliers).map((key) => (
-            <option key={key} value={key}>{key}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="mb-4">
-        <label className="block mb-1 font-medium">Environmental Stacks:</label>
-        <div className="grid grid-cols-2 gap-2">
-          {Object.entries(environmentStacks).map(([key, val]) => (
-            <label key={key} className="flex items-center">
-              <input
-                type="checkbox"
-                checked={selectedStacks.includes(key)}
-                onChange={() => toggleStack(key)}
-                className="mr-2"
-              />
-              {key} ({val}x)
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {warnings.length > 0 && (
-        <div className="bg-yellow-100 text-yellow-800 p-2 mb-4 rounded">
-          {warnings.map((w, idx) => (
-            <div key={idx}>{w}</div>
-          ))}
-        </div>
-      )}
-
-      <div className="text-lg font-semibold">
-        Total Value: <span className="text-green-600">{totalValue.toLocaleString()}x</span>
-      </div>
-    </div>
-  );
-}
+    // Initial calculation
+    calculateValue();
+  </script>
+</body>
+</html>
