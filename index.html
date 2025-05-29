@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GrowAGarden Calculator with AI Feedback & Sync</title>
+  <title>GrowAGarden Plant Cost Calculator with AI Feedback & Sync</title>
   <style>
     body {
       background: linear-gradient(to bottom, #e8fff1, #c7f5df);
@@ -238,9 +238,6 @@
 
   let currentCalc = null; // Store last calculation info for feedback
 
-  // Mock Sync API URL (replace with your real backend)
-  const SYNC_API_URL = 'https://your-sync-api.example.com/prices';
-
   // Calculate price function
   function calculate() {
     const fruit = fruitSelect.value.toLowerCase();
@@ -272,7 +269,7 @@
 
     breakdownDiv.innerHTML = `
       <strong>Breakdown:</strong><br>
-      Base price per kg: ${base}¢<br>
+      Base price per kg: ${base.toFixed(2)}¢<br>
       Weight: ${weight}kg<br>
       Modifiers: ${modifiers.join(", ") || "None"}<br>
       Multiplier: ×${multiplier.toFixed(2)}<br>
@@ -295,7 +292,7 @@
     };
   }
 
-  // User confirms price is accurate -> update learnedPrices and localStorage, then sync
+  // User confirms price is accurate -> update learnedPrices and localStorage
   btnAccurate.onclick = () => {
     if (!currentCalc) return;
 
@@ -308,38 +305,59 @@
       learnedPrices[fruit].confidence++;
     }
 
-    // Optionally adjust base price by averaging with current calculation base:
-    // Here, simplistic: new base = old base + 10% of difference towards current calc
-    // But since estimatedPrice = weight * base * multiplier,
-    // base ≈ estimatedPrice / (weight * multiplier)
+    // Adjust base price by averaging with current calculation base:
     const newBase = estimatedPrice / (weight * currentCalc.multiplier);
-
-    // Weighted average base update (confidence as weight)
     const oldConfidence = learnedPrices[fruit].confidence - 1;
     learnedPrices[fruit].base = (learnedPrices[fruit].base * oldConfidence + newBase) / learnedPrices[fruit].confidence;
 
-    // Save locally
     localStorage.setItem('learnedPrices', JSON.stringify(learnedPrices));
-
-    // Sync to server (async)
-    syncLearnedPrices(fruit, learnedPrices[fruit].base, learnedPrices[fruit].confidence);
-
-    alert("Thanks! Price confirmed and AI updated.");
-
-    // Hide feedback after confirm
-    feedbackButtons.style.display = 'none';
-    correctionInput.style.display = 'none';
+    alert("Thanks! Price confidence updated.");
+    calculate(); // Refresh display
   };
 
-  // User says price is inaccurate -> show correction input
+  // User reports price is inaccurate -> show correction input
   btnInaccurate.onclick = () => {
     correctionInput.style.display = 'block';
-    feedbackButtons.style.display = 'none';
   };
 
-  // User submits corrected price -> validate and update or reject AI data
+  // Submit corrected price, update learnedPrices
   submitCorrection.onclick = () => {
     if (!currentCalc) return;
 
     const correctPrice = parseInt(correctPriceInput.value);
-    if (isNaN(correctPrice) || correctPrice <= 0
+    if (isNaN(correctPrice) || correctPrice <= 0) {
+      alert("Please enter a valid corrected price (in cents).");
+      return;
+    }
+
+    const { fruit, weight, multiplier } = currentCalc;
+
+    // Calculate corrected base price from corrected total price
+    const correctedBase = correctPrice / (weight * multiplier);
+
+    // Update or add new learned price
+    if (!learnedPrices[fruit]) {
+      learnedPrices[fruit] = { base: correctedBase, confidence: 1 };
+    } else {
+      // Average previous base with corrected base, reset confidence (to 1)
+      learnedPrices[fruit].base = correctedBase;
+      learnedPrices[fruit].confidence = 1;
+    }
+
+    localStorage.setItem('learnedPrices', JSON.stringify(learnedPrices));
+    alert("Thanks for your correction! AI pricing updated.");
+    correctionInput.style.display = 'none';
+    correctPriceInput.value = '';
+    calculate();
+  };
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+
+  // Calculate on load with default values
+  window.onload = () => {
+    weightInput.value = 1;
+    calculate();
+  };
+</script>
+</body>
+</html>
