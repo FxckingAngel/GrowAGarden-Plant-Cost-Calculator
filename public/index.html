@@ -34,77 +34,33 @@
 <body>
   <h1>🌱 GrowAGarden Plant Cost Calculator</h1>
 
-<label for="plant">🌿 Plant Type</label>
-    <select id="plant">
-      <option value="apple">🍎 Apple</option>
-      <option value="banana">🍌 Banana</option>
-      <option value="bamboo">🎋 Bamboo</option>
-      <option value="beanstalk">🪴 Beanstalk</option>
-      <option value="blood banana">🩸🍌 Blood Banana</option>
-      <option value="blueberry">🫐 Blueberry</option>
-      <option value="cacao">🍫 Cacao</option>
-      <option value="cactus">🌵 Cactus</option>
-      <option value="carrot">🥕 Carrot</option>
-      <option value="cherry blossom">🌸 Cherry Blossom</option>
-      <option value="coconut">🥥 Coconut</option>
-      <option value="corn">🌽 Corn</option>
-      <option value="cranberry">🍒 Cranberry</option>
-      <option value="daffodil">🌼 Daffodil</option>
-      <option value="dragonfruit">🐉🍉 Dragonfruit</option>
-      <option value="durian">💀 Durian</option>
-      <option value="eggplant">🍆 Eggplant</option>
-      <option value="glowshroom">🍄 Glowshroom</option>
-      <option value="grape">🍇 Grape</option>
-      <option value="lemon">🍋 Lemon</option>
-      <option value="mango">🥭 Mango</option>
-      <option value="mint">🌿 Mint</option>
-      <option value="moon blossom">🌙🌸 Moon Blossom</option>
-      <option value="moonglow">🌙✨ Moonglow</option>
-      <option value="moon mango">🌙🥭 Moon Mango</option>
-      <option value="moon melon">🌙🍈 Moon Melon</option>
-      <option value="moonflower">🌙🌼 Moonflower</option>
-      <option value="mushroom">🍄 Mushroom</option>
-      <option value="nightshade">🌑 Nightshade</option>
-      <option value="orangetulip">🌷 Orange Tulip</option>
-      <option value="papaya">🍈 Papaya</option>
-      <option value="passionfruit">❤️‍🔥 Passionfruit</option>
-      <option value="peach">🍑 Peach</option>
-      <option value="pear">🍐 Pear</option>
-      <option value="pepper">🌶️ Pepper</option>
-      <option value="pineapple">🍍 Pineapple</option>
-      <option value="pumpkin">🎃 Pumpkin</option>
-      <option value="raspberry">🍓 Raspberry</option>
-      <option value="soulfruit">👻 Soulfruit</option>
-      <option value="starfruit">🌟 Starfruit</option>
-      <option value="strawberry">🍓 Strawberry</option>
-      <option value="tomato">🍅 Tomato</option>
-      <option value="venus fly trap">🪰 Venus Fly Trap</option>
-      <option value="watermelon">🍉 Watermelon</option>
-    </select>
+  <label for="plant">🌿 Plant Type</label>
+  <select id="plant"></select>
 
-<label for="mutation">🧬 Growth Mutation</label>
-    <select id="mutation">
-      <option value="1">None</option>
-      <option value="20">Golden ✨</option>
-      <option value="50">Rainbow 🌈</option>
-    </select>
+  <label for="mutation">🧬 Growth Mutation</label>
+  <select id="mutation">
+    <option value="1">None</option>
+    <option value="20">Golden ✨</option>
+    <option value="50">Rainbow 🌈</option>
+  </select>
 
-    <fieldset>
-      <legend>🌍 Environmental Stacks</legend>
-      <label class="env-label"><input type="checkbox" value="1" /> Wet 💧</label>
-      <label class="env-label"><input type="checkbox" value="1" /> Chilled 🧊</label>
-      <label class="env-label"><input type="checkbox" value="1" /> Chocolate 🍫</label>
-      <label class="env-label"><input type="checkbox" value="1" /> Moonlit 🌙</label>
-      <label class="env-label"><input type="checkbox" value="3" /> Bloodlit 🩸</label>
-      <label class="env-label"><input type="checkbox" value="5" /> Plasma ⚡</label>
-      <label class="env-label"><input type="checkbox" value="9" /> Frozen ❄️</label>
-      <label class="env-label"><input type="checkbox" value="24" /> Zombified 🧟‍♂️</label>
-      <label class="env-label"><input type="checkbox" value="30" /> Twisted 🌀</label>
-      <label class="env-label"><input type="checkbox" value="50" /> Rainbow 🌈</label>
-      <label class="env-label"><input type="checkbox" value="99" /> Shocked ⚡</label>
-      <label class="env-label"><input type="checkbox" value="119" /> Celestial ✨</label>
-      <label class="env-label"><input type="checkbox" value="124" /> Disco 💃</label>
-    </fieldset>
+  <fieldset>
+    <legend>🌍 Environmental Stacks</legend>
+    <label class="env-label"><input type="checkbox" value="1" /> Wet 💧</label>
+    <label class="env-label"><input type="checkbox" value="1" /> Chilled 🤊</label>
+    <label class="env-label"><input type="checkbox" value="1" /> Chocolate 🍫</label>
+    <label class="env-label"><input type="checkbox" value="1" /> Moonlit 🌙</label>
+    <label class="env-label"><input type="checkbox" value="3" /> Bloodlit 🩸</label>
+    <label class="env-label"><input type="checkbox" value="5" /> Plasma ⚡</label>
+    <label class="env-label"><input type="checkbox" value="9" /> Frozen ❄️</label>
+    <label class="env-label"><input type="checkbox" value="24" /> Zombified 🧟‍♂️</label>
+    <label class="env-label"><input type="checkbox" value="30" /> Twisted 🔀</label>
+    <label class="env-label"><input type="checkbox" value="50" /> Rainbow 🌈</label>
+    <label class="env-label"><input type="checkbox" value="99" /> Shocked ⚡</label>
+    <label class="env-label"><input type="checkbox" value="119" /> Celestial ✨</label>
+    <label class="env-label"><input type="checkbox" value="124" /> Disco 💃</label>
+  </fieldset>
+
   <label for="weight">⚖️ Input Weight (kg)</label>
   <input type="number" id="weight" placeholder="e.g. 0.17" step="0.01" />
 
@@ -162,20 +118,6 @@
       "watermelon": 2708
     };
 
-    const mutations = {
-      "Wet": 1,
-      "Chilled": 1,
-      "Chocolate": 1,
-      "Moonlit": 1,
-      "Bloodlit": 3,
-      "Plasma": 4,
-      "Frozen": 9,
-      "Zombified": 24,
-      "Shocked": 99,
-      "Celestial": 119,
-      "Disco": 124
-    };
-
     const plantSelect = document.getElementById("plant");
     Object.keys(plantBaseValues).sort().forEach(p => {
       const option = document.createElement("option");
@@ -184,49 +126,42 @@
       plantSelect.appendChild(option);
     });
 
-    const mutationSelect = document.getElementById("mutations");
-    Object.entries(mutations).forEach(([key, val]) => {
-      const option = document.createElement("option");
-      option.value = key;
-      option.textContent = key + ` (+${val})`;
-      mutationSelect.appendChild(option);
-    });
+    const mutationSelect = document.getElementById("mutation");
+    const envCheckboxes = document.querySelectorAll(".env-label input");
+    const weightInput = document.getElementById("weight");
 
-    document.querySelectorAll("#plant, #mutations, #growth, #weight").forEach(el => {
+    document.querySelectorAll("#plant, #mutation, #weight").forEach(el => {
       el.addEventListener("input", updateValue);
     });
+    envCheckboxes.forEach(cb => cb.addEventListener("input", updateValue));
 
     function updateValue() {
       const plant = plantSelect.value;
       const base = plantBaseValues[plant] || 0;
-      const weight = parseFloat(document.getElementById("weight").value || 1);
-      const growth = parseFloat(document.getElementById("growth").value || 1);
+      const growth = parseFloat(mutationSelect.value || 1);
+      const weight = parseFloat(weightInput.value || 1);
 
-      const selectedMutations = Array.from(mutationSelect.selectedOptions).map(opt => opt.value);
       let stack = 0;
+      let wet = false, chilled = false, frozen = false;
 
-      const envTypeCounts = {
-        Wet: 0,
-        Chilled: 0,
-        Frozen: 0
-      };
-
-      selectedMutations.forEach(m => {
-        if (["Wet", "Chilled", "Frozen"].includes(m)) {
-          envTypeCounts[m]++;
+      envCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          const label = cb.parentElement.textContent;
+          if (label.includes("Wet")) wet = true;
+          if (label.includes("Chilled")) chilled = true;
+          if (label.includes("Frozen")) frozen = true;
+          stack += parseInt(cb.value);
         }
-        stack += mutations[m] || 0;
       });
 
-      // Enforce one of Wet/Chilled/Frozen rule
-      if (envTypeCounts.Frozen > 0) {
-        stack -= envTypeCounts.Wet * mutations["Wet"];
-        stack -= envTypeCounts.Chilled * mutations["Chilled"];
-      } else if (envTypeCounts.Wet > 0 && envTypeCounts.Chilled > 0) {
-        stack -= envTypeCounts.Chilled * mutations["Chilled"];
+      if (frozen) {
+        if (wet) stack -= 1;
+        if (chilled) stack -= 1;
+      } else if (wet && chilled) {
+        stack -= 1; // remove chilled if both wet and chilled are checked
       }
 
-      const total = Math.round(base * growth * (1 + stack) * weight);
+      const total = Math.round(base * (1 + stack) * growth * weight);
       document.getElementById("result").textContent = `💰 Total Value: ${total.toLocaleString()} Sheckles`;
     }
   </script>
