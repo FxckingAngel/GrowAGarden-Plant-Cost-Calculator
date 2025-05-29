@@ -126,9 +126,11 @@
 
 <script>
   // Your known price data
+  // Each entry: {plant: string, modifiers: array, weight: number, price: number (in $)}
+  // Sorted by weight ascending within plant+modifiers
   const priceData = [
     {plant: "strawberry", modifiers: ["frozen"], weight: 0.25, price: 135},
-    {plant: "dragonfruit", modifiers: ["moonlit","wet"], weight: 1, price: 12861},
+    {plant: "dragonfruit", modifiers: ["moonlit","wet"], weight: 1, price: 12861}, // weight assumed 1 for no weight given, will fix later
     {plant: "strawberry", modifiers: ["wet"], weight: 0.26, price: 27},
     {plant: "strawberry", modifiers: [], weight: 0.23, price: 14},
     {plant: "dragonfruit", modifiers: ["wet"], weight: 12.56, price: 10414},
@@ -141,7 +143,7 @@
     {plant: "cranberry", modifiers: ["disco","wet"], weight: 1.24, price: 384357},
     {plant: "glowshroom", modifiers: ["wet"], weight: 0.73, price: 574},
     {plant: "moonflower", modifiers: ["wet"], weight: 2.11, price: 21147},
-    {plant: "mushroom", modifiers: ["frozen","shocked"], weight: 1, price: 14854248},
+    {plant: "mushroom", modifiers: ["frozen","shocked"], weight: 1, price: 14854248}, // weight assumed 1
     {plant: "beanstalk", modifiers: ["wet"], weight: 12.86, price: 66152},
     {plant: "mango", modifiers: ["wet"], weight: 17.50, price: 17705},
     {plant: "blueberry", modifiers: ["wet"], weight: 0.22, price: 49},
@@ -154,9 +156,10 @@
     {plant: "durian", modifiers: ["bloodlit","wet"], weight: 8.48, price: 28090},
     {plant: "durian", modifiers: ["celestial","wet"], weight: 8.81, price: 733382},
     {plant: "tomato", modifiers: [], weight: 0.68, price: 56},
-    {plant: "mushroom", modifiers: ["choc","wet","shocked"], weight: 1, price: 100000},
+    {plant: "mushroom", modifiers: ["choc","wet","shocked"], weight: 1, price: 100000}, // just example
   ];
 
+  // Normalize data - make modifiers always sorted alphabetically for matching
   priceData.forEach(d => d.modifiers.sort());
 
   function arraysEqual(a,b) {
@@ -169,22 +172,29 @@
 
   function findMatchingData(plant, modifiers) {
     modifiers = modifiers.slice().sort();
+    // Get all entries for this plant and modifiers exactly
     return priceData.filter(d => d.plant === plant && arraysEqual(d.modifiers, modifiers));
   }
 
+  // Linear interpolation helper
+  // Given x0,y0 and x1,y1 and x, return y
   function lerp(x0,y0,x1,y1,x){
-    if(x1 === x0) return y0;
+    if(x1 === x0) return y0; // avoid div by zero
     return y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
   }
 
+  // Find estimated price given plant, modifiers, weight
   function estimatePrice(plant, modifiers, weight) {
+    // Find all known data for plant+modifiers
     const matches = findMatchingData(plant, modifiers);
 
     if(matches.length === 0){
+      // No exact modifier match, try no modifiers for plant
       const baseMatches = findMatchingData(plant, []);
       if(baseMatches.length === 0){
-        return null;
+        return null; // no data at all for plant
       } else {
+        // fallback: average price/kg from baseMatches * weight
         let totalPrice = 0, totalWeight = 0;
         baseMatches.forEach(m => {
           totalPrice += m.price;
@@ -195,62 +205,72 @@
       }
     }
 
+    // Sort by weight ascending
     matches.sort((a,b) => a.weight - b.weight);
 
-    if(weight <= matches[0].weight)
+    // If weight less than smallest known weight, extrapolate down
+    if(weight <= matches[0].weight) {
+      let p = matches[0].price / matches[0].weight * weight;
+      return p;
+    }
 
+    // If weight greater than largest known weight, extrapolate up
+    if(weight >= matches[matches.length - 1].weight) {
+      let p = matches[matches.length - 1].price / matches[matches.length - 1].weight * weight;
+      return p;
+    }
 
+    // Find two nearest weights around input weight for interpolation
+    for(let i=0; i<matches.length - 1; i++) {
+      if(weight >= matches[i].weight && weight <= matches[i+1].weight) {
+        return lerp(
+          matches[i].weight, matches[i].price,
+          matches[i+1].weight, matches[i+1].price,
+          weight
+        );
+      }
+    }
 
-
-ChatGPT said:
-return matches[0].price;
-if(weight >= matches[matches.length-1].weight) return matches[matches.length-1].price;
-
-bash
-Copy
-Edit
-for(let i=0; i<matches.length-1; i++){
-  let w0 = matches[i].weight;
-  let w1 = matches[i+1].weight;
-  if(weight >= w0 && weight <= w1){
-    return lerp(w0, matches[i].price, w1, matches[i+1].price, weight);
+    // If no interpolation found (should not happen), fallback average price/kg
+    let totalPrice = 0, totalWeight = 0;
+    matches.forEach(m => {
+      totalPrice += m.price;
+      totalWeight += m.weight;
+    });
+    let avgPricePerKg = totalPrice / totalWeight;
+    return avgPricePerKg * weight;
   }
-}
 
-return matches[0].price;
-}
+  function calculate() {
+    const plant = document.getElementById('plant').value.toLowerCase();
+    const modifiersSelect = document.getElementById('modifiers');
+    const selectedModifiers = [...modifiersSelect.selectedOptions].map(o => o.value.toLowerCase());
+    const weightInput = parseFloat(document.getElementById('weight').value);
 
-function calculate() {
-const plant = document.getElementById("plant").value;
-const modifiers = Array.from(document.getElementById("modifiers").selectedOptions).map(o => o.value);
-let weight = parseFloat(document.getElementById("weight").value);
+    if(!plant){
+      alert('Please select a plant type.');
+      return;
+    }
+    if(isNaN(weightInput) || weightInput <= 0){
+      alert('Please enter a valid positive weight.');
+      return;
+    }
 
-javascript
-Copy
-Edit
-if(isNaN(weight) || weight <= 0){
-  document.getElementById("price").textContent = "Please enter a valid weight.";
-  return;
-}
+    // Calculate estimated price
+    const price = estimatePrice(plant, selectedModifiers, weightInput);
 
-const matches = findMatchingData(plant, modifiers);
-if(matches.length > 0){
-  const minWeight = Math.min(...matches.map(m => m.weight));
-  if(weight < minWeight){
-    weight = minWeight;
+    const priceDiv = document.getElementById('price');
+    if(price === null) {
+      priceDiv.textContent = Estimated Price: No data available;
+    } else {
+      priceDiv.textContent = Estimated Price: $${price.toFixed(2)};
+    }
+
+    // Show the report wrong price button only if we have an estimated price
+    document.getElementById('reportWrongBtn').style.display = price !== null ? 'inline-block' : 'none';
   }
-}
 
-const price = estimatePrice(plant, modifiers, weight);
-
-if(price === null){
-  document.getElementById("price").textContent = "No data available for this combination.";
-  document.getElementById("reportWrongBtn").style.display = "none";
-} else {
-  document.getElementById("price").textContent = `Estimated Price: $${price.toFixed(2)}`;
-  document.getElementById("reportWrongBtn").style.display = "inline-block";
-}
-}
 </script>
 
-</body> </html>
+</body>
+</html>
