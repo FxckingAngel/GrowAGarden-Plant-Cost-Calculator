@@ -61,10 +61,9 @@
   <h1>🌱 GrowAGarden Calculator</h1>
   <div class="calculator">
     <label for="plant">Plant Type</label>
-    <select id="plant" multiple size="6" style="height:auto;">
+    <select id="plant" size="6" style="height:auto;">
       <option value="apple">Apple</option>
       <option value="banana">Banana</option>
-      <option value="bamboo">Bamboo</option>
       <option value="beanstalk">Beanstalk</option>
       <option value="cactus">Cactus</option>
       <option value="cacao">Cacao</option>
@@ -77,22 +76,11 @@
       <option value="durian">Durian</option>
       <option value="eggplant">Eggplant</option>
       <option value="glowshroom">Glowshroom</option>
-      <option value="grape">Grape</option>
       <option value="mango">Mango</option>
       <option value="moonflower">Moonflower</option>
       <option value="mushroom">Mushroom</option>
-      <option value="orangetulip">Orangetulip</option>
-      <option value="papaya">Papaya</option>
-      <option value="passionfruit">Passionfruit</option>
-      <option value="pepper">Pepper</option>
-      <option value="pear">Pear</option>
-      <option value="peach">Peach</option>
-      <option value="pumpkin">Pumpkin</option>
-      <option value="raspberry">Raspberry</option>
-      <option value="soulfruit">Soulfruit</option>
       <option value="strawberry">Strawberry</option>
       <option value="tomato">Tomato</option>
-      <option value="watermelon">Watermelon</option>
     </select>
 
     <label for="weight">Weight (kg)</label>
@@ -119,11 +107,10 @@
   </div>
 
   <script>
-    // Your sample data entries as an array of objects
-    // Each record: { modifiers: sorted string array, plant: string, weight: number, price: dollars number }
+    // Sample data with modifiers sorted alphabetically
     const priceData = [
       {modifiers: ["frozen"], plant:"strawberry", weight:0.25, price:135},
-      {modifiers: ["moonlit","wet"], plant:"dragonfruit", weight:1, price:12861}, // weight unknown, guess 1kg (adjusted)
+      {modifiers: ["moonlit","wet"], plant:"dragonfruit", weight:1, price:12861},
       {modifiers: ["wet"], plant:"strawberry", weight:0.26, price:27},
       {modifiers: [], plant:"strawberry", weight:0.23, price:14},
       {modifiers: ["wet"], plant:"dragonfruit", weight:12.56, price:10414},
@@ -152,7 +139,7 @@
       {modifiers: ["choc","shocked","wet"], plant:"mushroom", weight:1, price:13900305},
     ];
 
-    // Sort modifiers in data entries for easy matching
+    // Sort modifiers for all records (just to be sure)
     priceData.forEach(d => d.modifiers.sort());
 
     function calculate() {
@@ -171,37 +158,72 @@
         return;
       }
 
-      // Find best matching record by plant and modifiers subset and closest weight
+      // Helper: count number of matched modifiers between two arrays
+      function countMatches(arr1, arr2) {
+        let count = 0;
+        let i = 0, j = 0;
+        while (i < arr1.length && j < arr2.length) {
+          if (arr1[i] === arr2[j]) {
+            count++;
+            i++;
+            j++;
+          } else if (arr1[i] < arr2[j]) {
+            i++;
+          } else {
+            j++;
+          }
+        }
+        return count;
+      }
+
+      let bestScore = -Infinity;
       let bestMatch = null;
-      let smallestWeightDiff = Infinity;
 
       for (const record of priceData) {
-        // Must be same plant
+        // Check plant similarity (exact only)
         if (record.plant !== selectedPlant) continue;
 
-        // All record modifiers must be in selectedModifiers (allow missing modifiers in selection)
-        if (!record.modifiers.every(m => selectedModifiers.includes(m))) continue;
+        // Weight difference
+        const weightDiff = Math.abs(record.weight - weight);
 
-        // Calculate weight difference
-        let diff = Math.abs(record.weight - weight);
-        if (diff < smallestWeightDiff) {
-          smallestWeightDiff = diff;
+        // Modifier matches count
+        const modMatches = countMatches(record.modifiers, selectedModifiers);
+
+        // Score formula:
+        // More modifier matches + smaller weight difference => better score
+        // Weight difference penalty scaled by 10 to balance against modifier matches
+        const score = modMatches * 10 - weightDiff;
+
+        if (score > bestScore) {
+          bestScore = score;
           bestMatch = record;
         }
       }
 
-      if (!bestMatch) {
-        document.getElementById("price").innerText = "No price data available for this combination.";
-        return;
+      if (bestMatch) {
+        // To refine price, do a linear interpolation for weight difference
+        const wDiff = Math.abs(bestMatch.weight - weight);
+        let price = bestMatch.price;
+
+        // Adjust price proportionally if weight is different (assuming linear price per weight)
+        if (bestMatch.weight !== 0) {
+          price = bestMatch.price * (weight / bestMatch.weight);
+        }
+
+        // If modifiers do not fully match, discount price by a factor
+        // Example: discount 10% per missing modifier
+        const maxModCount = Math.max(bestMatch.modifiers.length, selectedModifiers.length);
+        const modMatchCount = countMatches(bestMatch.modifiers, selectedModifiers);
+        const modDiffCount = maxModCount - modMatchCount;
+        const discount = 0.1 * modDiffCount;
+        price = price * (1 - discount);
+        if (price < 0) price = 0;
+
+        document.getElementById("price").innerText = `Estimated Price: $${price.toFixed(2)}`;
+      } else {
+        // No plant match found at all (very rare)
+        document.getElementById("price").innerText = `No data for plant "${selectedPlant}"`;
       }
-
-      // Price scale by weight ratio (linear scaling)
-      let estimatedPrice = (weight / bestMatch.weight) * bestMatch.price;
-
-      // Round and format
-      estimatedPrice = Math.round(estimatedPrice);
-
-      document.getElementById("price").innerText = `Estimated Price: $${estimatedPrice.toLocaleString()}`;
     }
   </script>
 </body>
