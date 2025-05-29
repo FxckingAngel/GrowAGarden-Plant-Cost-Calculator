@@ -1,174 +1,197 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🌱 GrowAGarden Plant Cost Calculator</title>
   <style>
     :root {
-      --bg: #121212;
-      --fg: #ffffff;
-      --accent: #4caf50;
-      --card: #1e1e1e;
-      --border: #333;
+      color-scheme: dark;
     }
-
     body {
-      background-color: var(--bg);
-      color: var(--fg);
       font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 2rem;
     }
-
-    h1 {
-      color: var(--accent);
+    label {
+      font-size: 1.2rem;
     }
-
-    select, input[type="checkbox"] {
+    select, option, input[type="checkbox"] {
+      font-size: 1rem;
       margin: 0.5rem;
-      padding: 0.5rem;
-      border-radius: 8px;
-      background: var(--card);
-      color: var(--fg);
-      border: 1px solid var(--border);
     }
-
-    .container {
-      background: var(--card);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 0 12px #000;
-      max-width: 600px;
-      width: 100%;
-    }
-
-    .checkbox-group label {
-      display: block;
-      margin: 4px 0;
-    }
-
-    .output {
+    .result {
+      margin-top: 2rem;
       font-size: 1.5rem;
-      margin-top: 1rem;
+      color: #00e676;
+    }
+    .env-label {
+      display: inline-block;
+      margin: 0.3rem 1rem 0.3rem 0;
+    }
+    .container {
+      max-width: 700px;
+      width: 100%;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h1>🌿 GrowAGarden Cost Calculator</h1>
-    <label for="plant">🌱 Choose a Plant:</label>
+    <h1>🌿 GrowAGarden Plant Cost Calculator</h1>
+
+    <label for="plant">🌿 Plant Type</label>
     <select id="plant">
-      <option value="Carrot">🥕 Carrot</option>
-      <option value="Strawberry">🍓 Strawberry</option>
-      <option value="Blueberry">🫐 Blueberry</option>
-      <option value="Orange Tulip">🌷 Orange Tulip</option>
-      <option value="Tomato">🍅 Tomato</option>
-      <option value="Corn">🌽 Corn</option>
-      <option value="Daffodil">🌼 Daffodil</option>
-      <option value="Watermelon">🍉 Watermelon</option>
-      <option value="Pumpkin">🎃 Pumpkin</option>
-      <option value="Apple">🍎 Apple</option>
-      <option value="Bamboo">🎋 Bamboo</option>
-      <option value="Coconut">🥥 Coconut</option>
-      <option value="Cactus">🌵 Cactus</option>
-      <option value="Dragon Fruit">🐉🍉 Dragon Fruit</option>
-      <option value="Mango">🥭 Mango</option>
-      <option value="Grape">🍇 Grape</option>
-      <option value="Mushroom">🍄 Mushroom</option>
-      <option value="Pepper">🌶️ Pepper</option>
-      <option value="Cacao">🍫 Cacao</option>
-      <option value="Beanstalk">🪴 Beanstalk</option>
-      <option value="Pear">🍐 Pear</option>
-      <option value="Raspberry">🍓 Raspberry</option>
-      <option value="Pineapple">🍍 Pineapple</option>
-      <option value="Peach">🍑 Peach</option>
-      <option value="Papaya">🍈 Papaya</option>
-      <option value="Banana">🍌 Banana</option>
-      <option value="Passionfruit">❤️‍🔥 Passionfruit</option>
-      <option value="Soul Fruit">👻 Soul Fruit</option>
-      <option value="Cursed Fruit">💀 Cursed Fruit</option>
-      <option value="Red Lollipop">🍭 Red Lollipop</option>
-      <option value="Candy Sunflower">🌻 Candy Sunflower</option>
-      <option value="Easter Egg">🥚 Easter Egg</option>
-      <option value="Candy Blossom">🌸 Candy Blossom</option>
-      <option value="Cranberry">🍒 Cranberry</option>
-      <option value="Durian">💀 Durian</option>
-      <option value="Eggplant">🍆 Eggplant</option>
-      <option value="Venus Fly Trap">🪰 Venus Fly Trap</option>
-      <option value="Lotus">🌺 Lotus</option>
-      <option value="Nightshade">🌑 Nightshade</option>
-      <option value="Glowshroom">🍄 Glowshroom</option>
-      <option value="Mint">🌿 Mint</option>
-      <option value="Moonflower">🌙🌼 Moonflower</option>
-      <option value="Starfruit">🌟 Starfruit</option>
-      <option value="Moonglow">🌙✨ Moonglow</option>
-      <option value="Moon Blossom">🌙🌸 Moon Blossom</option>
-      <option value="Blood Banana">🩸🍌 Blood Banana</option>
-      <option value="Moon Melon">🌙🍈 Moon Melon</option>
-      <option value="Celestiberry">💫 Celestiberry</option>
-      <option value="Moon Mango">🌙🥭 Moon Mango</option>
-      <option value="Lemon">🍋 Lemon</option>
-      <option value="Cherry Blossom">🌸 Cherry Blossom</option>
+      <option value="apple">🍎 Apple</option>
+      <option value="banana">🍌 Banana</option>
+      <option value="bamboo">🎋 Bamboo</option>
+      <option value="beanstalk">🪴 Beanstalk</option>
+      <option value="blood banana">🩸🍌 Blood Banana</option>
+      <option value="blueberry">🫐 Blueberry</option>
+      <option value="cacao">🍫 Cacao</option>
+      <option value="cactus">🌵 Cactus</option>
+      <option value="carrot">🥕 Carrot</option>
+      <option value="cherry blossom">🌸 Cherry Blossom</option>
+      <option value="coconut">🥥 Coconut</option>
+      <option value="corn">🌽 Corn</option>
+      <option value="cranberry">🍒 Cranberry</option>
+      <option value="daffodil">🌼 Daffodil</option>
+      <option value="dragonfruit">🐉🍉 Dragonfruit</option>
+      <option value="durian">💀 Durian</option>
+      <option value="eggplant">🍆 Eggplant</option>
+      <option value="glowshroom">🍄 Glowshroom</option>
+      <option value="grape">🍇 Grape</option>
+      <option value="lemon">🍋 Lemon</option>
+      <option value="mango">🥭 Mango</option>
+      <option value="mint">🌿 Mint</option>
+      <option value="moon blossom">🌙🌸 Moon Blossom</option>
+      <option value="moonglow">🌙✨ Moonglow</option>
+      <option value="moon mango">🌙🥭 Moon Mango</option>
+      <option value="moon melon">🌙🍈 Moon Melon</option>
+      <option value="moonflower">🌙🌼 Moonflower</option>
+      <option value="mushroom">🍄 Mushroom</option>
+      <option value="nightshade">🌑 Nightshade</option>
+      <option value="orangetulip">🌷 Orange Tulip</option>
+      <option value="papaya">🍈 Papaya</option>
+      <option value="passionfruit">❤️‍🔥 Passionfruit</option>
+      <option value="peach">🍑 Peach</option>
+      <option value="pear">🍐 Pear</option>
+      <option value="pepper">🌶️ Pepper</option>
+      <option value="pineapple">🍍 Pineapple</option>
+      <option value="pumpkin">🎃 Pumpkin</option>
+      <option value="raspberry">🍓 Raspberry</option>
+      <option value="soulfruit">👻 Soulfruit</option>
+      <option value="starfruit">🌟 Starfruit</option>
+      <option value="strawberry">🍓 Strawberry</option>
+      <option value="tomato">🍅 Tomato</option>
+      <option value="venus fly trap">🪰 Venus Fly Trap</option>
+      <option value="watermelon">🍉 Watermelon</option>
     </select>
 
-    <label for="mutation">🌟 Growth Mutation:</label>
+    <label for="mutation">🧬 Growth Mutation</label>
     <select id="mutation">
       <option value="1">None</option>
       <option value="20">Golden ✨</option>
       <option value="50">Rainbow 🌈</option>
     </select>
 
-    <div class="checkbox-group">
-      <label><input type="checkbox" value="1"> Wet 💧</label>
-      <label><input type="checkbox" value="1"> Chilled ❄️</label>
-      <label><input type="checkbox" value="1"> Chocolate 🍫</label>
-      <label><input type="checkbox" value="1"> Moonlit 🌙</label>
-      <label><input type="checkbox" value="3"> Bloodlit 🩸</label>
-      <label><input type="checkbox" value="4"> Plasma ⚡</label>
-      <label><input type="checkbox" value="9"> Frozen 🧊</label>
-      <label><input type="checkbox" value="24"> Zombified 🧟</label>
-      <label><input type="checkbox" value="30"> Twisted 🌀</label>
-      <label><input type="checkbox" value="99"> Shocked ⚡</label>
-      <label><input type="checkbox" value="119"> Celestial 🌌</label>
-      <label><input type="checkbox" value="124"> Disco 💃</label>
-    </div>
+    <fieldset>
+      <legend>🌍 Environmental Stacks</legend>
+      <label class="env-label"><input type="checkbox" value="1" /> Wet 💧</label>
+      <label class="env-label"><input type="checkbox" value="1" /> Chilled 🧊</label>
+      <label class="env-label"><input type="checkbox" value="1" /> Chocolate 🍫</label>
+      <label class="env-label"><input type="checkbox" value="1" /> Moonlit 🌙</label>
+      <label class="env-label"><input type="checkbox" value="3" /> Bloodlit 🩸</label>
+      <label class="env-label"><input type="checkbox" value="5" /> Plasma ⚡</label>
+      <label class="env-label"><input type="checkbox" value="9" /> Frozen ❄️</label>
+      <label class="env-label"><input type="checkbox" value="24" /> Zombified 🧟‍♂️</label>
+      <label class="env-label"><input type="checkbox" value="30" /> Twisted 🌀</label>
+      <label class="env-label"><input type="checkbox" value="50" /> Rainbow 🌈</label>
+      <label class="env-label"><input type="checkbox" value="99" /> Shocked ⚡</label>
+      <label class="env-label"><input type="checkbox" value="119" /> Celestial ✨</label>
+      <label class="env-label"><input type="checkbox" value="124" /> Disco 💃</label>
+    </fieldset>
 
-    <button onclick="calculate()">🔢 Calculate Total Value</button>
-    <div class="output" id="output">🌾 Total Value: ??? sheckles</div>
+    <div class="result" id="result">💰 Total Value: 0 Sheckles</div>
   </div>
 
   <script>
+    const plantSelect = document.getElementById('plant');
+    const mutationSelect = document.getElementById('mutation');
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const result = document.getElementById('result');
+
     const baseValues = {
-      "Carrot": 18, "Strawberry": 14, "Blueberry": 18, "Orange Tulip": 767,
-      "Tomato": 27, "Corn": 36, "Daffodil": 903, "Watermelon": 2708, "Pumpkin": 3700,
-      "Apple": 248, "Bamboo": 3610, "Coconut": 361, "Cactus": 3068, "Dragon Fruit": 4287,
-      "Mango": 5866, "Grape": 7085, "Mushroom": 136278, "Pepper": 7220, "Cacao": 9928,
-      "Beanstalk": 18050, "Pear": 500, "Raspberry": 90, "Pineapple": 1805, "Peach": 271,
-      "Papaya": 1000, "Banana": 1579, "Passionfruit": 3204, "Soul Fruit": 3000,
-      "Cursed Fruit": 15000, "Red Lollipop": 70000, "Candy Sunflower": 145000,
-      "Easter Egg": 4513, "Candy Blossom": 93567, "Cranberry": 1805, "Durian": 4513,
-      "Eggplant": 6769, "Venus Fly Trap": 17000, "Lotus": 20000, "Nightshade": 2000,
-      "Glowshroom": 175, "Mint": 0, "Moonflower": 8500, "Starfruit": 15538,
-      "Moonglow": 18000, "Moon Blossom": 45125, "Blood Banana": 5415, "Moon Melon": 16245,
-      "Celestiberry": 7220, "Moon Mango": 22563, "Lemon": 500, "Cherry Blossom": 550
+      "apple": 248,
+      "banana": 1579,
+      "bamboo": 3610,
+      "beanstalk": 18050,
+      "blood banana": 5415,
+      "blueberry": 18,
+      "cacao": 9928,
+      "cactus": 3068,
+      "carrot": 18,
+      "cherry blossom": 550,
+      "coconut": 361,
+      "corn": 36,
+      "cranberry": 1805,
+      "daffodil": 903,
+      "dragonfruit": 4287,
+      "durian": 4513,
+      "eggplant": 6769,
+      "glowshroom": 150,
+      "grape": 7085,
+      "lemon": 500,
+      "mango": 5866,
+      "mint": 0,
+      "moon blossom": 45125,
+      "moonglow": 18000,
+      "moon mango": 22563,
+      "moon melon": 16245,
+      "moonflower": 7000,
+      "mushroom": 136278,
+      "nightshade": 2000,
+      "orangetulip": 767,
+      "papaya": 1000,
+      "passionfruit": 3204,
+      "peach": 271,
+      "pear": 500,
+      "pepper": 7220,
+      "pineapple": 1805,
+      "pumpkin": 3700,
+      "raspberry": 90,
+      "soulfruit": 3000,
+      "starfruit": 15538,
+      "strawberry": 14,
+      "tomato": 27,
+      "venus fly trap": 17000,
+      "watermelon": 2708
     };
 
     function calculate() {
-      const plant = document.getElementById("plant").value;
-      const mutation = parseFloat(document.getElementById("mutation").value);
-      const checkboxes = document.querySelectorAll(".checkbox-group input:checked");
-      let stackSum = 0;
-
-      checkboxes.forEach(cb => stackSum += parseInt(cb.value));
-
+      const plant = plantSelect.value;
       const base = baseValues[plant] || 0;
-      const total = base * mutation * (1 + stackSum);
-
-      document.getElementById("output").innerText = `🌾 Total Value: ${Math.round(total).toLocaleString()} sheckles`;
+      const mutation = parseFloat(mutationSelect.value);
+      let stackSum = 0;
+      checkboxes.forEach(cb => {
+        if (cb.checked) stackSum += parseFloat(cb.value);
+      });
+      const total = Math.round(base * mutation * (1 + stackSum));
+      result.textContent = `💰 Total Value: ${total.toLocaleString()} Sheckles`;
     }
+
+    plantSelect.addEventListener('change', calculate);
+    mutationSelect.addEventListener('change', calculate);
+    checkboxes.forEach(cb => cb.addEventListener('change', calculate));
+
+    // Initial calculation
+    calculate();
   </script>
 </body>
+
 </html>
