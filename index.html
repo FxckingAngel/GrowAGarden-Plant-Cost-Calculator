@@ -72,6 +72,16 @@
       text-align: center;
     }
 
+    .breakdown {
+      margin-top: 1em;
+      font-size: 0.95em;
+      background: #f4fff9;
+      border-left: 4px solid #34c274;
+      padding: 1em;
+      border-radius: 0.5em;
+      color: #333;
+    }
+
     footer {
       margin-top: 3em;
       font-size: 0.9em;
@@ -104,6 +114,16 @@
       <option value="pepper">Pepper</option>
       <option value="cacao">Cacao</option>
       <option value="beanstalk">Beanstalk</option>
+      <option value="raspberry">Raspberry</option>
+      <option value="pear">Pear</option>
+      <option value="peach">Peach</option>
+      <option value="cranberry">Cranberry</option>
+      <option value="durian">Durian</option>
+      <option value="eggplant">Eggplant</option>
+      <option value="papaya">Papaya</option>
+      <option value="banana">Banana</option>
+      <option value="passionfruit">Passionfruit</option>
+      <option value="soulfruit">Soulfruit</option>
     </select>
 
     <label for="weight">Enter Weight (kg)</label>
@@ -128,6 +148,7 @@
 
     <button onclick="calculate()">💰 Calculate Price</button>
     <div class="result" id="price">Estimated Price: —</div>
+    <div class="breakdown" id="breakdown"></div>
   </div>
 
   <footer>
@@ -142,11 +163,11 @@
 
       if (isNaN(weight) || weight <= 0) {
         document.getElementById("price").innerText = "❗ Please enter a valid weight.";
+        document.getElementById("breakdown").innerText = "";
         return;
       }
 
       let basePricePerKg = 100;
-
       switch (fruit) {
         case "strawberry":
           if (modifiers.includes("gold")) basePricePerKg = 2740;
@@ -178,15 +199,21 @@
       };
 
       let multiplier = 1.0;
+      let breakdownText = `Base Price per kg: ${basePricePerKg} cents\nModifiers:`;
       for (const mod of modifiers) {
         if (modifierMultipliers[mod]) {
+          breakdownText += `\n - ${mod} ×${modifierMultipliers[mod]}`;
           multiplier *= modifierMultipliers[mod];
         }
       }
+      breakdownText += `\nCombined Multiplier: ×${multiplier.toFixed(2)}`;
+      breakdownText += `\nWeight: ${weight} kg`;
+      breakdownText += `\n\nFormula: ${weight} × ${basePricePerKg} × ${multiplier.toFixed(2)}`;
 
       const totalPrice = Math.round(weight * basePricePerKg * multiplier);
       document.getElementById("price").innerText =
         `Estimated Price: ${totalPrice} cents (${(totalPrice / 100).toFixed(2)} Robux)`;
+      document.getElementById("breakdown").innerText = breakdownText;
     }
   </script>
 </body>
