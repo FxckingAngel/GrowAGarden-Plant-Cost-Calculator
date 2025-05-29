@@ -1,11 +1,145 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GrowAGarden Plant Cost Calculator</title>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>
+<!-- Firebase CDN -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
+  authDomain: "growagardenplantcostcalculator.firebaseapp.com",
+  databaseURL: "https://growagardenplantcostcalculator-default-rtdb.firebaseio.com",
+  projectId: "growagardenplantcostcalculator",
+  storageBucket: "growagardenplantcostcalculator.firebasestorage.app",
+  messagingSenderId: "410113480248",
+  appId: "1:410113480248:web:72badb81206b458ecd38cd",
+  measurementId: "G-K7XD9NMRGZ"
+};
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const basePrices = {
+    strawberry: 63,
+    dragonfruit: 120,
+    coconut: 100,
+    durian: 500,
+    mushroom: 10000,
+    blueberry: 180,
+    tomato: 80,
+    apple: 100,
+    corn: 50,
+    celestlberry: 2000,
+  };
+
+  const modifierMultipliers = {
+    rainbow: 1.5, gold: 2.0, shocked: 2.1, frozen: 1.6, wet: 1.1,
+    chilled: 1.1, choc: 1.4, moonlit: 1.4, bloodlit: 1.6,
+    celestial: 5, disco: 3.5, zomb: 1.3, plasma: 1.7
+  };
+
+  let learnedPrices = {};
+
+  const fruitSelect = document.getElementById('fruit');
+  const weightInput = document.getElementById('weight');
+  const modifiersSelect = document.getElementById('modifiers');
+  const priceDiv = document.getElementById('price');
+  const breakdownDiv = document.getElementById('breakdown');
+  const confidenceDiv = document.getElementById('confidence');
+  const feedbackButtons = document.getElementById('feedbackButtons');
+  const btnAccurate = document.getElementById('btnAccurate');
+  const btnInaccurate = document.getElementById('btnInaccurate');
+  const correctionInput = document.getElementById('correctionInput');
+  const correctPriceInput = document.getElementById('correctPrice');
+  const submitCorrection = document.getElementById('submitCorrection');
+
+  function getMultiplier(mods) {
+    return mods.reduce((acc, mod) => acc * (modifierMultipliers[mod] || 1), 1);
+  }
+
+  let currentCalc = null;
+
+  async function loadPrices() {
+    const snapshot = await db.ref("learnedPrices").once("value");
+    learnedPrices = snapshot.val() || {};
+  }
+
+  async function calculate() {
+    const fruit = fruitSelect.value.toLowerCase();
+    const weight = parseFloat(weightInput.value);
+    const modifiers = Array.from(modifiersSelect.selectedOptions).map(o => o.value);
+
+    if (isNaN(weight) || weight <= 0) {
+      priceDiv.innerText = "❗ Please enter a valid weight.";
+      feedbackButtons.style.display = 'none';
+      correctionInput.style.display = 'none';
+      confidenceDiv.innerText = '';
+      breakdownDiv.innerHTML = '';
+      return;
+    }
+
+    const base = learnedPrices[fruit]?.base || basePrices[fruit] || 100;
+    const multiplier = getMultiplier(modifiers);
+    const estimatedPrice = Math.round(weight * base * multiplier);
+
+    priceDiv.innerText = `Estimated Price: ${estimatedPrice} cents (${(estimatedPrice/100).toFixed(2)} Robux)`;
+    confidenceDiv.innerText = learnedPrices[fruit] ?
+      `AI Confidence: ${learnedPrices[fruit].confidence} confirmation(s)` : `AI Confidence: No data yet`;
+
+    breakdownDiv.innerHTML = `
+      <strong>Breakdown:</strong><br>
+      Base price per kg: ${base.toFixed(2)}¢<br>
+      Weight: ${weight}kg<br>
+      Modifiers: ${modifiers.join(", ") || "None"}<br>
+      Multiplier: ×${multiplier.toFixed(2)}<br>
+      Final: ${estimatedPrice} cents
+    `;
+
+    feedbackButtons.style.display = 'flex';
+    correctionInput.style.display = 'none';
+    correctPriceInput.value = '';
+
+    currentCalc = { fruit, weight, modifiers, estimatedPrice, base, multiplier };
+  }
+
+  btnAccurate.onclick = async () => {
+    if (!currentCalc) return;
+    const { fruit, weight, estimatedPrice, multiplier } = currentCalc;
+    const current = learnedPrices[fruit] || { base: basePrices[fruit], confidence: 0 };
+    const newBase = estimatedPrice / (weight * multiplier);
+    const newConfidence = current.confidence + 1;
+    const updatedBase = (current.base * current.confidence + newBase) / newConfidence;
+
+    await db.ref(`learnedPrices/${fruit}`).set({ base: updatedBase, confidence: newConfidence });
+    await loadPrices();
+    alert("Thanks! Price confidence updated.");
+    calculate();
+  };
+
+  btnInaccurate.onclick = () => {
+    correctionInput.style.display = 'block';
+  };
+
+  submitCorrection.onclick = async () => {
+    if (!currentCalc) return;
+    const correctPrice = parseInt(correctPriceInput.value);
+    if (isNaN(correctPrice) || correctPrice <= 0) {
+      alert("Please enter a valid corrected price (in cents).");
+      return;
+    }
+
+    const { fruit, weight, multiplier } = currentCalc;
+    const correctedBase = correctPrice / (weight * multiplier);
+
+    await db.ref(`learnedPrices/${fruit}`).set({ base: correctedBase, confidence: 1 });
+    await loadPrices();
+    alert("Thanks for your correction! AI pricing updated.");
+    correctionInput.style.display = 'none';
+    correctPriceInput.value = '';
+    calculate();
+  };
+
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+
+  window.onload = async () => {
+    weightInput.value = 1;
+    await loadPrices();
+    calculate();
+  };
+</script>
