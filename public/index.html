@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GrowAGarden Price Estimator</title>
+<title>GrowAGarden Calculator</title>
 <style>
   body {
     background: #e6f9ee;
@@ -30,7 +30,7 @@
     margin: 0.75em 0 0.25em;
     font-weight: bold;
   }
-  select, input, button {
+  input, select, button {
     width: 100%;
     padding: 0.6em;
     margin-bottom: 1em;
@@ -53,58 +53,57 @@
     font-weight: bold;
     color: #333;
     margin-top: 1em;
-    min-height: 1.5em;
   }
 </style>
 </head>
 <body>
-<h1>🌱 GrowAGarden Price Estimator</h1>
+
+<h1>🌱 GrowAGarden Calculator</h1>
 <div class="calculator">
   <label for="plant">Plant Type</label>
-<select id="plant" name="plant">
-  <option value="apple">🍎 Apple</option>
-  <option value="banana">🍌 Banana</option>
-  <option value="bamboo">🎍 Bamboo</option>
-  <option value="beanstalk">🌱 Beanstalk</option>
-  <option value="cacao">🍫 Cacao</option>
-  <option value="carrot">🥕 Carrot</option>
-  <option value="corn">🌽 Corn</option>
-  <option value="coconut">🥥 Coconut</option>
-  <option value="cranberry">🫐 Cranberry</option>
-  <option value="daffodil">🌼 Daffodil</option>
-  <option value="dragonfruit">🐉 Dragonfruit</option>
-  <option value="durian">👑 Durian</option>
-  <option value="eggplant">🍆 Eggplant</option>
-  <option value="grape">🍇 Grape</option>
-  <option value="mango">🥭 Mango</option>
-  <option value="moon melon">🌙🍈 Moon Melon</option>
-  <option value="moon blossom">🌙🌸 Moon Blossom</option>
-  <option value="mushroom">🍄 Mushroom</option>
-  <option value="nightshade">🌑 Nightshade</option>
-  <option value="orangetulip">🌷 Orangetulip</option>
-  <option value="papaya">🥭 Papaya</option>
-  <option value="passionfruit">💜 Passionfruit</option>
-  <option value="peach">🍑 Peach</option>
-  <option value="pear">🍐 Pear</option>
-  <option value="pepper">🌶️ Pepper</option>
-  <option value="pumpkin">🎃 Pumpkin</option>
-  <option value="raspberry">🍓 Raspberry</option>
-  <option value="soulfruit">✨ Soulfruit</option>
-  <option value="strawberry">🍓 Strawberry</option>
-  <option value="tomato">🍅 Tomato</option>
-  <option value="watermelon">🍉 Watermelon</option>
-</select>
-
-
+  <select id="plant">
+    <option value="apple">Apple</option>
+    <option value="banana">Banana</option>
+    <option value="bamboo">Bamboo</option>
+    <option value="beanstalk">Beanstalk</option>
+    <option value="blood banana">Blood Banana</option>
+    <option value="blueberry">Blueberry</option>
+    <option value="cactus">Cactus</option>
+    <option value="cacao">Cacao</option>
+    <option value="carrot">Carrot</option>
+    <option value="corn">Corn</option>
+    <option value="cranberry">Cranberry</option>
+    <option value="coconut">Coconut</option>
+    <option value="daffodil">Daffodil</option>
+    <option value="dragonfruit">Dragonfruit</option>
+    <option value="durian">Durian</option>
+    <option value="eggplant">Eggplant</option>
+    <option value="glowshroom">Glowshroom</option>
+    <option value="grape">Grape</option>
+    <option value="mango">Mango</option>
+    <option value="moon blossom">Moon Blossom</option>
+    <option value="moon melon">Moon Melon</option>
+    <option value="moonflower">Moonflower</option>
+    <option value="mushroom">Mushroom</option>
+    <option value="nightshade">Nightshade</option>
+    <option value="orangetulip">Orange Tulip</option>
+    <option value="papaya">Papaya</option>
+    <option value="passionfruit">Passionfruit</option>
+    <option value="pear">Pear</option>
+    <option value="peach">Peach</option>
+    <option value="pepper">Pepper</option>
+    <option value="pumpkin">Pumpkin</option>
+    <option value="raspberry">Raspberry</option>
+    <option value="soulfruit">Soulfruit</option>
+    <option value="strawberry">Strawberry</option>
+    <option value="tomato">Tomato</option>
+    <option value="watermelon">Watermelon</option>
   </select>
 
-  <label for="weight">Weight (kg)</label>
-  <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42" />
-
   <label for="modifiers">Modifiers (hold Ctrl/Cmd to select multiple)</label>
-  <select id="modifiers" multiple size="6" style="height:auto;">
+  <select id="modifiers" multiple size="6">
     <option value="rainbow">🌈 Rainbow</option>
-    <option value="gold">👑 Gold</option>
+    <option value="gold">🥇 Gold</option>
     <option value="shocked">⚡ Shocked</option>
     <option value="frozen">❄️ Frozen</option>
     <option value="wet">💧 Wet</option>
@@ -113,127 +112,165 @@
     <option value="moonlit">🌙 Moonlit</option>
     <option value="bloodlit">🩸 Bloodlit</option>
     <option value="celestial">✨ Celestial</option>
-    <option value="disco">🎉 Disco</option>
-    <option value="zombplasma">🧟 Zomb Plasma</option>
+    <option value="disco">🪩 Disco</option>
+    <option value="zomb plasma">🧟 Zomb Plasma</option>
   </select>
+
+  <label for="weight">Weight (kg)</label>
+  <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42" />
 
   <button onclick="calculate()">💰 Calculate</button>
   <div class="result" id="price">Estimated Price: —</div>
+  <button id="reportWrongBtn" style="display:none;">Report Wrong Price</button>
 </div>
 
 <script>
-  // Your provided dataset:
-  const data = [
-    {modifiers: ["frozen"], plant:"strawberry", weight:0.25, price:135},
-    {modifiers: ["moonlit","wet"], plant:"dragonfruit", weight:1, price:12861},
-    {modifiers: ["wet"], plant:"strawberry", weight:0.26, price:27},
-    {modifiers: [], plant:"strawberry", weight:0.23, price:14},
-    {modifiers: ["wet"], plant:"dragonfruit", weight:12.56, price:10414},
-    {modifiers: [], plant:"celestlberry", weight:2.13, price:9040},
-    {modifiers: ["wet"], plant:"celestlberry", weight:2.30, price:21123},
-    {modifiers: ["shocked"], plant:"coconut", weight:18.72, price:71503},
-    {modifiers: ["shocked","wet"], plant:"coconut", weight:15.88, price:51953},
-    {modifiers: ["gold","wet"], plant:"coconut", weight:18.83, price:28944},
-    {modifiers: [], plant:"durian", weight:46.20, price:166789},
-    {modifiers: ["disco","wet"], plant:"cranberry", weight:1.24, price:384357},
-    {modifiers: ["wet"], plant:"glowshroom", weight:0.73, price:574},
-    {modifiers: ["wet"], plant:"moonflower", weight:2.11, price:21147},
-    {modifiers: ["frozen","shocked"], plant:"mushroom", weight:1, price:14854248},
-    {modifiers: ["wet"], plant:"beanstalk", weight:12.86, price:66152},
-    {modifiers: ["wet"], plant:"mango", weight:17.5, price:17705},
-    {modifiers: ["wet"], plant:"blueberry", weight:0.22, price:49},
-    {modifiers: ["gold","wet"], plant:"blueberry", weight:0.27, price:1471},
-    {modifiers: ["bloodlit","wet"], plant:"banana", weight:1.95, price:20374},
-    {modifiers: ["blood"], plant:"banana", weight:2.09, price:11676},
-    {modifiers: ["wet"], plant:"corn", weight:2.49, price:124},
-    {modifiers: ["wet"], plant:"apple", weight:3.36, price:691},
-    {modifiers: ["wet"], plant:"tomato", weight:0.67, price:109},
-    {modifiers: ["bloodlit","wet","durian"], plant:"durian", weight:8.48, price:28090},
-    {modifiers: ["celestial","wet","durian"], plant:"durian", weight:8.81, price:733382},
-    {modifiers: [], plant:"tomato", weight:0.68, price:56},
-    {modifiers: ["choc","shocked","wet"], plant:"mushroom", weight:1, price:13900305},
+  // Your known price data
+  // Each entry: {plant: string, modifiers: array, weight: number, price: number (in $)}
+  // Sorted by weight ascending within plant+modifiers
+  const priceData = [
+    {plant: "strawberry", modifiers: ["frozen"], weight: 0.25, price: 135},
+    {plant: "dragonfruit", modifiers: ["moonlit","wet"], weight: 1, price: 12861}, // weight assumed 1 for no weight given, will fix later
+    {plant: "strawberry", modifiers: ["wet"], weight: 0.26, price: 27},
+    {plant: "strawberry", modifiers: [], weight: 0.23, price: 14},
+    {plant: "dragonfruit", modifiers: ["wet"], weight: 12.56, price: 10414},
+    {plant: "celestialberry", modifiers: [], weight: 2.13, price: 9040},
+    {plant: "celestialberry", modifiers: ["wet"], weight: 2.30, price: 21123},
+    {plant: "coconut", modifiers: ["shocked"], weight: 18.72, price: 71503},
+    {plant: "coconut", modifiers: ["wet","shocked"], weight: 15.88, price: 51953},
+    {plant: "coconut", modifiers: ["wet","gold"], weight: 18.83, price: 28944},
+    {plant: "durian", modifiers: [], weight: 46.20, price: 166789},
+    {plant: "cranberry", modifiers: ["disco","wet"], weight: 1.24, price: 384357},
+    {plant: "glowshroom", modifiers: ["wet"], weight: 0.73, price: 574},
+    {plant: "moonflower", modifiers: ["wet"], weight: 2.11, price: 21147},
+    {plant: "mushroom", modifiers: ["frozen","shocked"], weight: 1, price: 14854248}, // weight assumed 1
+    {plant: "beanstalk", modifiers: ["wet"], weight: 12.86, price: 66152},
+    {plant: "mango", modifiers: ["wet"], weight: 17.50, price: 17705},
+    {plant: "blueberry", modifiers: ["wet"], weight: 0.22, price: 49},
+    {plant: "blueberry", modifiers: ["wet","gold"], weight: 0.27, price: 1471},
+    {plant: "blood banana", modifiers: ["wet"], weight: 1.95, price: 20374},
+    {plant: "blood banana", modifiers: [], weight: 2.09, price: 11676},
+    {plant: "corn", modifiers: ["wet"], weight: 2.49, price: 124},
+    {plant: "apple", modifiers: ["wet"], weight: 3.36, price: 691},
+    {plant: "tomato", modifiers: ["wet"], weight: 0.67, price: 109},
+    {plant: "durian", modifiers: ["bloodlit","wet"], weight: 8.48, price: 28090},
+    {plant: "durian", modifiers: ["celestial","wet"], weight: 8.81, price: 733382},
+    {plant: "tomato", modifiers: [], weight: 0.68, price: 56},
+    {plant: "mushroom", modifiers: ["choc","wet","shocked"], weight: 1, price: 100000}, // just example
   ];
 
-  // Normalize modifiers (sort)
-  data.forEach(d => d.modifiers.sort());
+  // Normalize data - make modifiers always sorted alphabetically for matching
+  priceData.forEach(d => d.modifiers.sort());
 
-  // Build base price per kg by plant (average of price/weight ignoring modifiers)
-  const basePricePerKg = {};
-  const plantWeightSums = {};
-  const plantPriceSums = {};
-
-  data.forEach(({plant, weight, price, modifiers}) => {
-    if (modifiers.length === 0) { // only base data, no modifiers
-      if (!plantWeightSums[plant]) {
-        plantWeightSums[plant] = 0;
-        plantPriceSums[plant] = 0;
-      }
-      plantWeightSums[plant] += weight;
-      plantPriceSums[plant] += price;
+  function arraysEqual(a,b) {
+    if(a.length !== b.length) return false;
+    for(let i=0; i<a.length; i++){
+      if(a[i] !== b[i]) return false;
     }
-  });
-
-  for (const plant in plantWeightSums) {
-    basePricePerKg[plant] = plantPriceSums[plant] / plantWeightSums[plant];
+    return true;
   }
 
-  // If plant has no base data, estimate base price per kg by average price/weight across all plants (fallback)
-  const allBasePrices = Object.values(basePricePerKg);
-  const avgBasePricePerKg = allBasePrices.reduce((a,b)=>a+b,0)/allBasePrices.length;
+  function findMatchingData(plant, modifiers) {
+    modifiers = modifiers.slice().sort();
+    // Get all entries for this plant and modifiers exactly
+    return priceData.filter(d => d.plant === plant && arraysEqual(d.modifiers, modifiers));
+  }
 
-  // Calculate modifier multipliers
-  // For each modifier, average ratio of (price per kg with modifier) / (base price per kg for plant)
-  const modifierRatios = {};
-  const modifierCounts = {};
+  // Linear interpolation helper
+  // Given x0,y0 and x1,y1 and x, return y
+  function lerp(x0,y0,x1,y1,x){
+    if(x1 === x0) return y0; // avoid div by zero
+    return y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
+  }
 
-  data.forEach(({plant, modifiers, weight, price}) => {
-    if (modifiers.length > 0) {
-      const base = basePricePerKg[plant] || avgBasePricePerKg;
-      const pricePerKg = price / weight;
-      const ratio = pricePerKg / base;
-      modifiers.forEach(mod => {
-        if (!modifierRatios[mod]) {
-          modifierRatios[mod] = 0;
-          modifierCounts[mod] = 0;
-        }
-        modifierRatios[mod] += ratio;
-        modifierCounts[mod]++;
-      });
+  // Find estimated price given plant, modifiers, weight
+  function estimatePrice(plant, modifiers, weight) {
+    // Find all known data for plant+modifiers
+    const matches = findMatchingData(plant, modifiers);
+
+    if(matches.length === 0){
+      // No exact modifier match, try no modifiers for plant
+      const baseMatches = findMatchingData(plant, []);
+      if(baseMatches.length === 0){
+        return null; // no data at all for plant
+      } else {
+        // fallback: average price/kg from baseMatches * weight
+        let totalPrice = 0, totalWeight = 0;
+        baseMatches.forEach(m => {
+          totalPrice += m.price;
+          totalWeight += m.weight;
+        });
+        let avgPricePerKg = totalPrice / totalWeight;
+        return avgPricePerKg * weight;
+      }
     }
-  });
 
-  for (const mod in modifierRatios) {
-    modifierRatios[mod] /= modifierCounts[mod];
+    // Sort by weight ascending
+    matches.sort((a,b) => a.weight - b.weight);
+
+    // If weight less than smallest known weight, extrapolate down
+    if(weight <= matches[0].weight) {
+      let p = matches[0].price / matches[0].weight * weight;
+      return p;
+    }
+
+    // If weight greater than largest known weight, extrapolate up
+    if(weight >= matches[matches.length - 1].weight) {
+      let p = matches[matches.length - 1].price / matches[matches.length - 1].weight * weight;
+      return p;
+    }
+
+    // Find two nearest weights around input weight for interpolation
+    for(let i=0; i<matches.length - 1; i++) {
+      if(weight >= matches[i].weight && weight <= matches[i+1].weight) {
+        return lerp(
+          matches[i].weight, matches[i].price,
+          matches[i+1].weight, matches[i+1].price,
+          weight
+        );
+      }
+    }
+
+    // If no interpolation found (should not happen), fallback average price/kg
+    let totalPrice = 0, totalWeight = 0;
+    matches.forEach(m => {
+      totalPrice += m.price;
+      totalWeight += m.weight;
+    });
+    let avgPricePerKg = totalPrice / totalWeight;
+    return avgPricePerKg * weight;
   }
 
   function calculate() {
-    const plant = document.getElementById("plant").value;
-    const weight = parseFloat(document.getElementById("weight").value);
-    const modifiersSelect = document.getElementById("modifiers");
-    const modifiers = Array.from(modifiersSelect.selectedOptions).map(o => o.value).sort();
+    const plant = document.getElementById('plant').value.toLowerCase();
+    const modifiersSelect = document.getElementById('modifiers');
+    const selectedModifiers = [...modifiersSelect.selectedOptions].map(o => o.value.toLowerCase());
+    const weightInput = parseFloat(document.getElementById('weight').value);
 
-    if (!plant || isNaN(weight) || weight <= 0) {
-      document.getElementById("price").innerText = "Please select a plant and enter a valid weight.";
+    if(!plant){
+      alert('Please select a plant type.');
+      return;
+    }
+    if(isNaN(weightInput) || weightInput <= 0){
+      alert('Please enter a valid positive weight.');
       return;
     }
 
-    // Base price per kg for plant or fallback avg
-    const base = basePricePerKg[plant] || avgBasePricePerKg;
-
-    // Calculate combined modifier multiplier (product of each modifier's multiplier)
-    let totalModifierMultiplier = 1;
-    modifiers.forEach(mod => {
-      if (modifierRatios[mod]) {
-        totalModifierMultiplier *= modifierRatios[mod];
-      }
-    });
-
     // Calculate estimated price
-    let estimatedPrice = base * weight * totalModifierMultiplier;
+    const price = estimatePrice(plant, selectedModifiers, weightInput);
 
-    // Display price
-    document.getElementById("price").innerText = `Estimated Price: $${estimatedPrice.toFixed(2)}`;
+    const priceDiv = document.getElementById('price');
+    if(price === null) {
+      priceDiv.textContent = `Estimated Price: No data available`;
+    } else {
+      priceDiv.textContent = `Estimated Price: $${price.toFixed(2)}`;
+    }
+
+    // Show the report wrong price button only if we have an estimated price
+    document.getElementById('reportWrongBtn').style.display = price !== null ? 'inline-block' : 'none';
   }
+
 </script>
+
 </body>
 </html>
