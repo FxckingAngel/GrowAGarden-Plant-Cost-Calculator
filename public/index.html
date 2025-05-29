@@ -3,38 +3,85 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GrowAGarden Price Calculator</title>
+<title>GrowAGarden Plant Cost Calculator</title>
 <style>
-  body { font-family: Arial, sans-serif; padding: 2rem; max-width: 400px; margin: auto; }
-  label, select, input, button { display: block; margin-bottom: 1rem; width: 100%; }
-  select[multiple] { height: 120px; }
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 450px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #f0f9f9;
+    border-radius: 10px;
+    box-shadow: 0 0 8px #ccc;
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #317873;
+  }
+  label {
+    font-weight: bold;
+    margin-top: 1rem;
+  }
+  select, input, button {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    margin-top: 0.25rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  select[multiple] {
+    height: 140px;
+  }
+  button {
+    background-color: #317873;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #245e5b;
+  }
+  #price-output {
+    font-size: 1.5rem;
+    color: #317873;
+    margin-top: 1rem;
+    text-align: center;
+  }
+  #error-msg {
+    color: red;
+    margin-top: 1rem;
+    font-weight: bold;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
 
-<h2>Plant Cost Calculator</h2>
+<h2>GrowAGarden Plant Cost Calculator</h2>
 
 <label for="plant-select">Select Plant:</label>
 <select id="plant-select">
-  <!-- JS fills options -->
+  <option value="" disabled selected>-- Choose a plant --</option>
 </select>
 
-<label for="modifier-select">Select Modifiers (Ctrl+Click to multi-select):</label>
-<select id="modifier-select" multiple>
-  <!-- JS fills options -->
-</select>
+<label for="modifier-select">Select Modifiers (Ctrl/Cmd+Click to select multiple):</label>
+<select id="modifier-select" multiple></select>
 
-<label for="weight-input">Weight (kg):</label>
-<input type="number" id="weight-input" step="0.01" min="0" value="1" />
+<label for="weight-input">Enter Weight (kg):</label>
+<input type="number" id="weight-input" step="0.01" min="0.01" placeholder="e.g. 1.25" />
 
 <button id="calc-btn">Calculate Price</button>
 
-<h3>Price: <span id="price-output">-</span></h3>
+<div id="price-output">Price: -</div>
+<div id="error-msg"></div>
 
 <script>
-  // Paste the startingData, plantsList, modifiersList, arraysEqual, calculatePrice here
-
-  // Starting data
+  // Starting data (your initial price examples)
   const startingData = [
     { modifiers: ['frozen'], plant: 'strawberry', weight: 0.25, price: 135 },
     { modifiers: ['moonlit'], plant: 'dragonfruit', weight: 1, price: 12861 },
@@ -66,6 +113,7 @@
     { modifiers: ['choc', 'wet', 'shocked'], plant: 'mushroom', weight: 1, price: 13900305 },
   ];
 
+  // Lists from your data
   const modifiersList = [
     "rainbow", "gold", "shocked", "frozen", "wet", "chilled", "choc",
     "moonlit", "bloodlit", "celestial", "disco", "zomb", "plasma"
@@ -80,35 +128,19 @@
     "Watermelon"
   ];
 
-  // Fill plant select options
-  const plantSelect = document.getElementById('plant-select');
-  plantsList.forEach(plant => {
-    const option = document.createElement('option');
-    option.value = plant.toLowerCase();
-    option.textContent = plant;
-    plantSelect.appendChild(option);
-  });
-
-  // Fill modifier select options
-  const modifierSelect = document.getElementById('modifier-select');
-  modifiersList.forEach(mod => {
-    const option = document.createElement('option');
-    option.value = mod;
-    option.textContent = mod.charAt(0).toUpperCase() + mod.slice(1);
-    modifierSelect.appendChild(option);
-  });
-
+  // Utility function to check arrays equality (order matters)
   function arraysEqual(a, b) {
     if (a.length !== b.length) return false;
     for(let i = 0; i < a.length; i++) if(a[i] !== b[i]) return false;
     return true;
   }
 
+  // Calculate price function
   function calculatePrice(selectedPlant, selectedModifiers, inputWeight) {
     const plant = selectedPlant.toLowerCase();
     const modifiers = selectedModifiers.map(m => m.toLowerCase()).sort();
 
-    // Try exact match first
+    // Try exact match first (modifiers, plant, and weight close)
     for (const entry of startingData) {
       if (
         entry.plant.toLowerCase() === plant &&
@@ -119,7 +151,7 @@
       }
     }
 
-    // No exact match, try interpolation
+    // No exact match, find all entries for plant+modifiers and interpolate by price per kg
     const filtered = startingData.filter(entry =>
       entry.plant.toLowerCase() === plant &&
       arraysEqual(entry.modifiers.slice().sort(), modifiers)
@@ -129,25 +161,60 @@
       return null; // no data for combo
     }
 
+    // Find closest weight entry to inputWeight
     filtered.sort((a,b) => Math.abs(a.weight - inputWeight) - Math.abs(b.weight - inputWeight));
     const closest = filtered[0];
 
+    // Price per kg * inputWeight
     const pricePerKg = closest.price / closest.weight;
     return +(pricePerKg * inputWeight).toFixed(2);
   }
 
-  document.getElementById('calc-btn').addEventListener('click', () => {
-    const plant = plantSelect.value;
-    const selectedModifiers = Array.from(modifierSelect.selectedOptions).map(o => o.value);
-    const weight = parseFloat(document.getElementById('weight-input').value);
+  // Populate plant select dropdown
+  const plantSelect = document.getElementById('plant-select');
+  plantsList.forEach(plant => {
+    const option = document.createElement('option');
+    option.value = plant.toLowerCase();
+    option.textContent = plant;
+    plantSelect.appendChild(option);
+  });
 
-    if (!plant || !weight || weight <= 0) {
-      alert('Please select a plant and enter a valid weight');
+  // Populate modifiers multi-select
+  const modifierSelect = document.getElementById('modifier-select');
+  modifiersList.forEach(mod => {
+    const option = document.createElement('option');
+    option.value = mod.toLowerCase();
+    option.textContent = mod.charAt(0).toUpperCase() + mod.slice(1);
+    modifierSelect.appendChild(option);
+  });
+
+  // Calculate button click handler
+  document.getElementById('calc-btn').addEventListener('click', () => {
+    const selectedPlant = plantSelect.value;
+    const selectedModifiers = Array.from(modifierSelect.selectedOptions).map(o => o.value);
+    const weightInput = parseFloat(document.getElementById('weight-input').value);
+    const priceOutput = document.getElementById('price-output');
+    const errorMsg = document.getElementById('error-msg');
+
+    errorMsg.textContent = '';
+    priceOutput.textContent = 'Price: -';
+
+    if (!selectedPlant) {
+      errorMsg.textContent = 'Please select a plant.';
+      return;
+    }
+    if (!weightInput || weightInput <= 0) {
+      errorMsg.textContent = 'Please enter a valid positive weight.';
       return;
     }
 
-    const price = calculatePrice(plant, selectedModifiers, weight);
-    document.getElementById('price-output').textContent = price === null ? 'No data for selection' : `$${price.toLocaleString()}`;
+    const price = calculatePrice(selectedPlant, selectedModifiers, weightInput);
+    if (price === null) {
+      errorMsg.textContent = 'No pricing data available for this plant and modifiers combination.';
+      return;
+    }
+
+    priceOutput.textContent = `Price: $${price.toLocaleString()}`;
   });
 </script>
 
