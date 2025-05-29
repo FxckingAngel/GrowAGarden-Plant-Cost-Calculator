@@ -1,80 +1,122 @@
-// Firebase configuration and initialization
-const firebaseConfig = {
-  apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
-  authDomain: "growagardenplantcostcalculator.firebaseapp.com",
-  databaseURL: "https://growagardenplantcostcalculator-default-rtdb.firebaseio.com",
-  projectId: "growagardenplantcostcalculator",
-  storageBucket: "growagardenplantcostcalculator.firebasestorage.app",
-  messagingSenderId: "410113480248",
-  appId: "1:410113480248:web:72badb81206b458ecd38cd",
-  measurementId: "G-K7XD9NMRGZ"
-};
+import { db, doc, setDoc, getDoc, updateDoc } from './firebase.js';
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+const plantSelect = document.getElementById('plant');
+const plantList = ["Aloe", "Basil", "Carrot", "Daisy", "Eucalyptus", "Fern", "Garlic", "Hydrangea"];
+plantList.sort().forEach(p => {
+  const opt = document.createElement("option");
+  opt.value = p;
+  opt.textContent = p;
+  plantSelect.appendChild(opt);
+});
 
-// Helper function to check price closeness (25% margin)
-function isCloseEnough(userPrice, estimatedPrice, margin = 0.25) {
-  const diff = Math.abs(userPrice - estimatedPrice);
-  return diff / estimatedPrice <= margin;
+const priceMemory = {};
+
+async function calculatePrice() {
+  const plant = plantSelect.value;
+  const weight = Number(document.getElementById("weight").value);
+  const modifier = document.getElementById("modifier").value;
+
+  const base = weight * 0.05;
+  const mod = modifier === "organic" ? 1.2 : modifier === "rare" ? 2.0 : 1;
+  const predicted = Math.round(base * mod * 100) / 100;
+
+  const key = `${plant}_${weight}_${modifier}`;
+  priceMemory[key] = priceMemory[key] || [];
+
+  // Fetch saved corrections
+  const docRef = doc(db, "prices", key);
+  const snap = await getDoc(docRef);
+  if (snap.exists()) {
+    const verified = snap.data().verified || [];
+    if (verified.length > 0) {
+      const avg = verified.reduce((a, b) => a + b, 0) / verified.length;
+      document.getElementById("result").textContent = `Verified Price: $${avg.toFixed(2)}`;
+      return;
+    }
+  }
+
+  document.getElementById("result").textContent = `Predicted Price: $${predicted}`;
 }
 
-// Validate user input against trusted data in Firebase
-async function validateUserInput(name, weight, modifiers, userPrice) {
-  const key = `${name.toLowerCase()}|${weight}|${modifiers.sort().join(",")}`;
-  const ref = database.ref('trustedPrices');
-  const snapshot = await ref.once('value');
-  const data = snapshot.val() || {};
+async function submitCorrection() {
+  const plant = plantSelect.value;
+  const weight = Number(document.getElementById("weight").value);
+  const modifier = document.getElementById("modifier").value;
+  const corrected = Number(document.getElementById("correctedPrice").value);
+  const key = `${plant}_${weight}_${modifier}`;
 
-  // Find closest known price for the same plant name and modifiers
-  let closestMatch = null;
-  let minDistance = Infinity;
+  const docRef = doc(db, "prices", key);
+  const snap = await getDoc(docRef);
+  const data = snap.exists() ? snap.data() : { verified: [], rejected: [] };
 
-  for (const savedKey in data) {
-    const [savedName, savedWeightStr, savedModifiersStr] = savedKey.split("|");
-    const savedPrice = data[savedKey];
-    const savedWeight = parseFloat(savedWeightStr);
-    const weightDiff = Math.abs(savedWeight - parseFloat(weight));
+  const predicted = Math.round(weight * 0.05 * (modifier === "organic" ? 1.2 : modifier === "rare" ? 2.0 : 1) * 100) / 100;
 
-    if (savedName === name.toLowerCase()) {
-      const savedModifiers = savedModifiersStr ? savedModifiersStr.split(",") : [];
-      const matchCount = modifiers.filter(mod => savedModifiers.includes(mod)).length;
-      // Calculate a simple "distance" metric; lower is better
-      const distance = weightDiff - matchCount;
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestMatch = savedPrice;
+  const diff = Math.abs(corrected - predicted);
+  if (diff <= 0.2 * predicted) {
+    data.verified.push(corrected);
+    await setDoc(docRef, data);
+    document.getElementById("correctionStatus").textContent = "✅ Correction accepted.";
+  } else {
+    data.rejected.push(corrected);
+    await setDoc(docRef, data);
+    document.getElementById("correctionStatus").textContent = "❌ Correction rejected (too far from prediction).";
+  }
+}
+
+// Admin logic
+const ADMIN_PASSWORD = "secret123";
+
+function checkAdmin() {
+  const input = document.getElementById("adminPass").value;
+  if (input === ADMIN_PASSWORD) {
+    document.getElementById("adminLogin").style.display = "none";
+    document.getElementById("adminPanel").style.display = "block";
+    loadTrends();
+  } else {
+    alert("Wrong password.");
+  }
+}
+
+async function loadTrends() {
+  const ctx = document.getElementById("trendChart").getContext("2d");
+
+  // Get price trend for each plant
+  const trends = {};
+  for (const plant of plantList) {
+    for (const modifier of ["none", "organic", "rare"]) {
+      const key = `${plant}_100_${modifier}`;
+      const snap = await getDoc(doc(db, "prices", key));
+      if (snap.exists()) {
+        const data = snap.data();
+        const avg = data.verified.length
+          ? data.verified.reduce((a, b) => a + b, 0) / data.verified.length
+          : null;
+        if (avg) {
+          trends[plant] = trends[plant] || [];
+          trends[plant].push(avg);
+        }
       }
     }
   }
 
-  if (closestMatch && isCloseEnough(userPrice, closestMatch)) {
-    // Accept user price, add/update trusted data
-    await ref.child(key).set(userPrice);
-    return { accepted: true, estimated: closestMatch };
-  }
+  const labels = Object.keys(trends);
+  const datasets = [{
+    label: "Average Verified Price (per 100g)",
+    data: labels.map(p => {
+      const values = trends[p];
+      return values ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : 0;
+    }),
+    backgroundColor: 'rgba(75, 192, 192, 0.5)'
+  }];
 
-  return { accepted: false, estimated: closestMatch };
+  new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
 }
-
-// Submit button handler
-document.getElementById("submitPrice").onclick = async () => {
-  const name = document.getElementById("plantName").value.trim();
-  const weight = document.getElementById("plantWeight").value.trim();
-  const modifiers = Array.from(document.querySelectorAll(".modifier:checked")).map(m => m.value);
-  const userPrice = parseFloat(document.getElementById("plantPrice").value);
-
-  if (!name || !weight || isNaN(userPrice)) {
-    alert("Please fill all fields correctly.");
-    return;
-  }
-
-  const result = await validateUserInput(name, weight, modifiers, userPrice);
-
-  if (result.accepted) {
-    alert("Price accepted! AI has added this to trusted data.");
-  } else {
-    alert(`Suspicious price. Closest known estimate is $${result.estimated || "unknown"}. Data not added.`);
-  }
-};
