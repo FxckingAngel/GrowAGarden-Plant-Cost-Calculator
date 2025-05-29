@@ -1,156 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GrowAGarden Plant Cost Calculator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GrowAGarden Calculator</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; background: #f0f8f0; }
-    h1 { text-align: center; }
-    label, select, input, button { display: block; margin: 10px 0; width: 100%; }
-    .modifiers label { display: inline-block; margin: 5px; }
-    #result { font-weight: bold; margin-top: 20px; font-size: 1.3em; }
-    #adminPanel { margin-top: 40px; padding: 10px; border: 1px solid #ccc; background: #fff5f5; display: none; }
+    body {
+      background: #e6f9ee;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2em;
+    }
+
+    h1 {
+      color: #248f50;
+      font-size: 2rem;
+    }
+
+    .calculator {
+      background: white;
+      padding: 1.5em;
+      border-radius: 1em;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    label {
+      display: block;
+      margin: 0.75em 0 0.25em;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 0.6em;
+      margin-bottom: 1em;
+      border: 1px solid #ccc;
+      border-radius: 0.4em;
+      font-size: 1em;
+    }
+
+    button {
+      background-color: #31a76d;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #278e5a;
+    }
+
+    .result {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #333;
+      margin-top: 1em;
+    }
   </style>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
-  <h1>GrowAGarden Plant Cost Calculator</h1>
-  <label for="plant">Select Plant:</label>
-  <select id="plant"></select>
+  <h1>🌱 GrowAGarden Calculator</h1>
+  <div class="calculator">
+    <label for="fruit">Fruit Type</label>
+    <select id="fruit"></select>
 
-  <div class="modifiers" id="modifiers"></div>
+    <label for="weight">Weight (kg)</label>
+    <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42">
 
-  <label for="weight">Enter Weight (kg):</label>
-  <input type="number" step="0.01" id="weight">
+    <label for="modifiers">Modifiers</label>
+    <select id="modifiers" multiple></select>
 
-  <button onclick="calculatePrice()">Calculate Price</button>
-  <div id="result"></div>
-
-  <div id="adminPanel">
-    <h3>Admin Panel</h3>
-    <button onclick="toggleAdminPending()">Toggle Pending Entries</button>
-    <ul id="pendingList"></ul>
+    <button onclick="calculatePrice()">💰 Calculate</button>
+    <div class="result" id="price">Estimated Price: —</div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getDatabase, ref, get, child, set } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
       authDomain: "growagardenplantcostcalculator.firebaseapp.com",
       databaseURL: "https://growagardenplantcostcalculator-default-rtdb.firebaseio.com",
       projectId: "growagardenplantcostcalculator",
-      storageBucket: "growagardenplantcostcalculator.firebasestorage.app",
+      storageBucket: "growagardenplantcostcalculator.appspot.com",
       messagingSenderId: "410113480248",
       appId: "1:410113480248:web:72badb81206b458ecd38cd",
       measurementId: "G-K7XD9NMRGZ"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
 
-    const plants = ["Carrot","Strawberry","Blueberry","Orangetulip","Tomato","Corn","Daffodil","Watermelon","Pumpkin","Apple","Bamboo","Coconut","Cactus","Dragonfruit","Mango","Grape","Mushroom","Pepper","Cacao","Beanstalk","Raspberry","Pear","Peach","Cranberry","Durian","Eggplant","Papaya","Banana","Passionfruit","Soulfruit"];
-    const modifiers = ["Rainbow","Gold","Shocked","Frozen","Wet","Chilled","Choc","Moonlit","Bloodlit","Celestial","Disco","Zomb","Plasma"];
-    const knownData = new Map([
-      ["frozen+strawberry+0.25", 135],
-      ["moonlit+wet+dragonfruit+12.861", 12861],
-      ["wet+strawberry+0.26", 27],
-      ["strawberry+0.23", 14],
-      ["wet+dragonfruit+12.56", 10414],
-      ["celestial+blueberry+2.13", 9040],
-      ["wet+celestial+blueberry+2.30", 21123],
-      ["shocked+coconut+18.72", 71503],
-      ["wet+shocked+coconut+15.88", 51953],
-      ["wet+gold+coconut+18.83", 28944],
-      ["durian+46.20", 166789],
-      ["disco+wet+cranberry+1.24", 384357],
-      ["wet+glowshroom+0.73", 574],
-      ["wet+moonflower+2.11", 21147],
-      ["frozen+shocked+mushroom+1.00", 14854248],
-      ["wet+beanstalk+12.86", 66152],
-      ["wet+mango+17.50", 17705],
-      ["wet+blueberry+0.22", 49],
-      ["wet+gold+blueberry+0.27", 1471],
-      ["wet+blood+banana+1.95", 20374],
-      ["blood+banana+2.09", 11676],
-      ["wet+corn+2.49", 124],
-      ["wet+apple+3.36", 691],
-      ["wet+tomato+0.67", 109],
-      ["bloodlit+wet+durian+8.48", 28090],
-      ["celestial+wet+durian+8.81", 733382],
-      ["tomato+0.68", 56],
-      ["choc+wet+shocked+mushroom+1.00", 13900305]
-    ]);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    const plantSel = document.getElementById("plant");
-    plants.forEach(p => plantSel.innerHTML += `<option>${p}</option>`);
+    const fruits = ["Carrot", "Strawberry", "Blueberry", "Orangetulip", "Tomato", "Corn", "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut", "Cactus", "Dragonfruit", "Mango", "Grape", "Mushroom", "Pepper", "Cacao", "Beanstalk", "Raspberry", "Pear", "Peach", "Cranberry", "Durian", "Eggplant", "Papaya", "Banana", "Passionfruit", "Soulfruit"];
+    const modifiers = ["Rainbow", "Gold", "Shocked", "Frozen", "Wet", "Chilled", "Choc", "Moonlit", "Bloodlit", "Celestial", "Disco", "Zomb", "Plasma"];
 
-    const modDiv = document.getElementById("modifiers");
-    modifiers.forEach(m => {
-      const id = `mod-${m.toLowerCase()}`;
-      modDiv.innerHTML += `<label><input type="checkbox" id="${id}" value="${m.toLowerCase()}"> ${m}</label>`;
+    const fruitSelect = document.getElementById("fruit");
+    const modSelect = document.getElementById("modifiers");
+
+    fruits.forEach(f => {
+      const option = document.createElement("option");
+      option.value = f.toLowerCase();
+      option.textContent = f;
+      fruitSelect.appendChild(option);
     });
 
-    function normalizeKey(mods, plant, weight) {
-      return [...mods.sort(), plant.toLowerCase(), (+weight).toFixed(3)].join("+");
-    }
+    modifiers.forEach(m => {
+      const option = document.createElement("option");
+      option.value = m.toLowerCase();
+      option.textContent = m;
+      modSelect.appendChild(option);
+    });
 
-    function bestMatch(mods, plant, weight) {
-      const base = plant.toLowerCase() + "+" + (+weight).toFixed(3);
-      let best = null;
-      for (const [key, price] of knownData.entries()) {
-        if (key.endsWith(base) && mods.every(m => key.includes(m))) {
-          best = { key, price };
-        }
-      }
-      return best;
-    }
-
-    function calculatePrice() {
-      const plant = plantSel.value;
+    async function calculatePrice() {
+      const fruit = fruitSelect.value;
       const weight = parseFloat(document.getElementById("weight").value);
-      const mods = Array.from(document.querySelectorAll("#modifiers input:checked")).map(x => x.value);
-      const key = normalizeKey(mods, plant, weight);
-      let price = knownData.get(key);
+      const selectedMods = Array.from(modSelect.selectedOptions).map(o => o.value);
 
-      if (!price) {
-        const match = bestMatch(mods, plant, weight);
-        if (match) price = match.price;
+      if (!fruit || isNaN(weight) || weight <= 0) {
+        document.getElementById("price").innerText = "❗ Please enter a valid fruit and weight.";
+        return;
       }
 
-      if (price) {
-        document.getElementById("result").innerText = `Estimated Price: $${price.toLocaleString()}`;
+      const key = [
+        ...selectedMods.sort(),
+        fruit,
+        weight.toFixed(2)
+      ].join("|");
+
+      const snap = await get(child(ref(db), `prices/${key}`));
+      if (snap.exists()) {
+        const price = snap.val();
+        document.getElementById("price").innerText = `Estimated Price: $${price.toLocaleString()}`;
       } else {
-        document.getElementById("result").innerText = "Unknown combination. Logging for learning...";
-        db.ref("pending/" + btoa(key)).set({ plant, weight, modifiers: mods, timestamp: Date.now() });
-      }
-    }
-
-    let adminShown = false;
-    function toggleAdminPending() {
-      adminShown = !adminShown;
-      document.getElementById("adminPanel").style.display = adminShown ? "block" : "none";
-      if (adminShown) {
-        db.ref("pending").once("value", snap => {
-          const ul = document.getElementById("pendingList");
-          ul.innerHTML = "";
-          for (const [key, val] of Object.entries(snap.val() || {})) {
-            const li = document.createElement("li");
-            li.innerText = `${val.modifiers.join(", ")} ${val.plant} ${val.weight}kg`;
-            const approveBtn = document.createElement("button");
-            approveBtn.innerText = "Approve";
-            approveBtn.onclick = () => {
-              const id = normalizeKey(val.modifiers, val.plant, val.weight);
-              knownData.set(id, prompt("Enter correct price for this item:"));
-              db.ref("pending/" + key).remove();
-              toggleAdminPending();
-            };
-            const rejectBtn = document.createElement("button");
-            rejectBtn.innerText = "Reject";
-            rejectBtn.onclick = () => { db.ref("pending/" + key).remove(); toggleAdminPending(); };
-            li.appendChild(approveBtn);
-            li.appendChild(rejectBtn);
-            ul.appendChild(li);
-          }
+        document.getElementById("price").innerText = `❓ Unknown combination. Submitting for review...`;
+        await set(ref(db, `pending/${key}`), {
+          fruit,
+          weight,
+          modifiers: selectedMods,
+          timestamp: Date.now()
         });
       }
     }
