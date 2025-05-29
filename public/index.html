@@ -1,457 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🌱 GrowAGarden Cost Calculator</title>
-  <style>
-    :root {
-      --bg-light: #eef3f9;
-      --bg-dark: #121212;
-      --text-light: #333;
-      --text-dark: #eee;
-      --primary-green: #4caf50;
-      --warning-red: #c62828;
-      --box-shadow-light: 0 10px 30px rgba(0,0,0,0.1);
-      --box-shadow-dark: 0 10px 30px rgba(255,255,255,0.15);
-      --bg-result-light: #f0f8ff;
-      --bg-result-dark: #223322;
-      --bg-warning-light: #ffecec;
-      --bg-warning-dark: #441111;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 2rem;
-      background: var(--bg-light);
-      color: var(--text-light);
-      transition: background 0.3s, color 0.3s;
-    }
-
-    body.dark {
-      background: var(--bg-dark);
-      color: var(--text-dark);
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .container {
-      max-width: 820px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: var(--box-shadow-light);
-      transition: background 0.3s, box-shadow 0.3s;
-    }
-    body.dark .container {
-      background: #1c1c1c;
-      box-shadow: var(--box-shadow-dark);
-    }
-
-    .section {
-      margin-bottom: 1.5rem;
-    }
-
-    label {
-      font-weight: 600;
-      display: block;
-      margin: 0.5rem 0 0.2rem;
-    }
-
-    select, input[type="number"] {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      transition: background 0.3s, color 0.3s, border-color 0.3s;
-      background: white;
-      color: black;
-    }
-    body.dark select,
-    body.dark input[type="number"] {
-      background: #222;
-      color: #eee;
-      border-color: #555;
-    }
-
-    .checkbox-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
-    }
-
-    .checkbox-group label {
-      font-weight: 400;
-      background: #f4f4f4;
-      padding: 0.4rem 0.7rem;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.3s, border-color 0.3s, color 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-    body.dark .checkbox-group label {
-      background: #222;
-      border-color: #444;
-      color: #ddd;
-    }
-    .checkbox-group input[type="checkbox"]:disabled + span {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .result {
-      font-size: 1.3rem;
-      margin-top: 1rem;
-      font-weight: 600;
-      background: var(--bg-result-light);
-      padding: 1rem;
-      border-left: 5px solid var(--primary-green);
-      border-radius: 6px;
-      transition: background 0.3s, border-color 0.3s;
-    }
-    body.dark .result {
-      background: var(--bg-result-dark);
-      border-color: #88cc88;
-    }
-
-    .warning {
-      margin-top: 1rem;
-      padding: 1rem;
-      border-left: 5px solid var(--warning-red);
-      background: var(--bg-warning-light);
-      color: var(--warning-red);
-      font-weight: bold;
-      border-radius: 6px;
-      white-space: pre-line;
-      transition: background 0.3s, border-color 0.3s, color 0.3s;
-    }
-    body.dark .warning {
-      background: var(--bg-warning-dark);
-      color: #ff7777;
-      border-color: #ff4444;
-    }
-
-    .mutations-summary {
-      margin-top: 0.5rem;
-      font-size: 0.95rem;
-      color: #555;
-      transition: color 0.3s;
-    }
-    body.dark .mutations-summary {
-      color: #aaa;
-    }
-
-    .toggle-theme {
-      display: block;
-      margin: 0 auto 2rem auto;
-      padding: 0.5rem 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: 6px;
-      border: none;
-      background: var(--primary-green);
-      color: white;
-      box-shadow: 0 3px 7px rgba(0, 128, 0, 0.5);
-      transition: background 0.3s;
-    }
-    .toggle-theme:hover {
-      background: #388e3c;
-    }
-
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GrowAGarden Plant Mutation Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 1em auto;
+    padding: 1em;
+    background: #f0f8ff;
+    color: #333;
+  }
+  label {
+    font-weight: bold;
+    display: block;
+    margin-top: 1em;
+  }
+  select, input[type=number] {
+    width: 100%;
+    padding: 0.4em;
+    margin-top: 0.2em;
+    font-size: 1em;
+  }
+  .mutations {
+    margin-top: 1em;
+  }
+  .mutation-group {
+    margin-bottom: 1em;
+  }
+  .mutation-group label {
+    font-weight: normal;
+    margin-right: 1em;
+  }
+  .warning {
+    color: red;
+    font-weight: bold;
+    margin-top: 1em;
+  }
+  .result {
+    margin-top: 1.5em;
+    font-size: 1.2em;
+    font-weight: bold;
+    background: #d1e7dd;
+    padding: 1em;
+    border-radius: 6px;
+    color: #0f5132;
+  }
+</style>
 </head>
 <body>
-  <button class="toggle-theme" id="toggleThemeBtn">🌙 Toggle Dark Mode</button>
 
-  <div class="container">
-    <h1>🌱 GrowAGarden Cost Calculator</h1>
+<h1>GrowAGarden Mutation Calculator</h1>
 
-    <div class="section">
-      <label for="plant">🌿 Plant Type</label>
-      <select id="plant">
-        <option value="apple">🍎 Apple</option>
-        <option value="banana">🍌 Banana</option>
-        <option value="bamboo">🎋 Bamboo</option>
-        <option value="beanstalk">🪴 Beanstalk</option>
-        <option value="blood banana">🩸🍌 Blood Banana</option>
-        <option value="blueberry">🫐 Blueberry</option>
-        <option value="cactus">🌵 Cactus</option>
-        <option value="cacao">🍫 Cacao</option>
-        <option value="carrot">🥕 Carrot</option>
-        <option value="corn">🌽 Corn</option>
-        <option value="cranberry">🍒 Cranberry</option>
-        <option value="coconut">🥥 Coconut</option>
-        <option value="daffodil">🌼 Daffodil</option>
-        <option value="dragonfruit">🐉🍉 Dragonfruit</option>
-        <option value="durian">💀 Durian</option>
-        <option value="eggplant">🍆 Eggplant</option>
-        <option value="glowshroom">🍄 Glowshroom</option>
-        <option value="grape">🍇 Grape</option>
-        <option value="mango">🥭 Mango</option>
-        <option value="moon blossom">🌙🌸 Moon Blossom</option>
-        <option value="moon melon">🌙🍈 Moon Melon</option>
-        <option value="moonflower">🌙🌼 Moonflower</option>
-        <option value="mushroom">🍄 Mushroom</option>
-        <option value="nightshade">🌑 Nightshade</option>
-        <option value="orangetulip">🌷 Orange Tulip</option>
-        <option value="papaya">🍈 Papaya</option>
-        <option value="passionfruit">❤️‍🔥 Passionfruit</option>
-        <option value="pear">🍐 Pear</option>
-        <option value="peach">🍑 Peach</option>
-        <option value="pepper">🌶️ Pepper</option>
-        <option value="pumpkin">🎃 Pumpkin</option>
-        <option value="raspberry">🍓 Raspberry</option>
-        <option value="soulfruit">👻 Soulfruit</option>
-        <option value="strawberry">🍓 Strawberry</option>
-        <option value="tomato">🍅 Tomato</option>
-        <option value="watermelon">🍉 Watermelon</option>
-      </select>
+<label for="plant">🌿 Plant Type</label>
+<select id="plant"></select>
 
-      <label for="weight">⚖️ Weight (kg)</label>
-      <input type="number" id="weight" value="1" min="0.1" step="0.1" />
-    </div>
+<label for="basePrice">Base Price (Gold)</label>
+<input type="number" id="basePrice" min="0" step="0.01" />
 
-    <div class="section">
-      <label for="mutation">✨ Growth Mutation</label>
-      <select id="mutation">
-        <option value="">None</option>
-        <option value="Golden">🌟 Golden (×20)</option>
-        <option value="Rainbow">🌈 Rainbow (×50)</option>
-      </select>
-    </div>
-
-    <div class="section">
-      <label>🌡️ Environmental Effects</label>
-      <div class="checkbox-group" id="envEffects">
-        <label><input type="checkbox" id="wet" /> <span>💧 Wet (×1.2)</span></label>
-        <label><input type="checkbox" id="chilled" /> <span>❄️ Chilled (×1.1)</span></label>
-        <label><input type="checkbox" id="frozen" /> <span>🧊 Frozen (×1.3)</span></label>
-      </div>
-    </div>
-
-    <button id="calculateBtn" style="font-weight: 600; padding: 0.5rem 1rem; border-radius: 6px; border:none; background:#4caf50; color:white; cursor:pointer;">Calculate Cost</button>
-
-    <div id="result" class="result" style="display:none;"></div>
-    <div id="warning" class="warning" style="display:none;"></div>
+<div class="mutations">
+  <label>Growth Mutations (Choose one):</label>
+  <div class="mutation-group" id="growthMutations">
+    <label><input type="radio" name="growth" value="none" checked /> None</label>
+    <label><input type="radio" name="growth" value="golden" /> Golden (×20)</label>
+    <label><input type="radio" name="growth" value="rainbow" /> Rainbow (×50)</label>
   </div>
 
+  <label>Environmental Mutations (Choose any, but restrictions apply):</label>
+  <div class="mutation-group" id="envMutations">
+    <label><input type="checkbox" name="env" value="wet" /> Wet (×2)</label>
+    <label><input type="checkbox" name="env" value="chilled" /> Chilled (×2)</label>
+    <label><input type="checkbox" name="env" value="chocolate" /> Chocolate (×2)</label>
+    <label><input type="checkbox" name="env" value="moonlit" /> Moonlit (×2)</label>
+    <label><input type="checkbox" name="env" value="bloodlit" /> Bloodlit (×4)</label>
+    <label><input type="checkbox" name="env" value="plasma" /> Plasma (×5)</label>
+    <label><input type="checkbox" name="env" value="frozen" /> Frozen (×10)</label>
+    <label><input type="checkbox" name="env" value="zombified" /> Zombified (×25)</label>
+    <label><input type="checkbox" name="env" value="twisted" /> Twisted (×30)</label>
+    <label><input type="checkbox" name="env" value="shocked" /> Shocked (×100)</label>
+    <label><input type="checkbox" name="env" value="celestial" /> Celestial (×120)</label>
+    <label><input type="checkbox" name="env" value="disco" /> Disco (×125)</label>
+  </div>
+</div>
+
+<div class="warning" id="warning" style="display:none;"></div>
+
+<div class="result" id="result" style="display:none;"></div>
+
 <script>
-  (() => {
-    // Constants for pricing and multipliers
-    const plantBasePrices = {
-      apple: 1,
-      banana: 1,
-      bamboo: 1,
-      beanstalk: 1,
-      "blood banana": 1,
-      blueberry: 1,
-      cactus: 1,
-      cacao: 1,
-      carrot: 1,
-      corn: 1,
-      cranberry: 1,
-      coconut: 1,
-      daffodil: 1,
-      dragonfruit: 1,
-      durian: 1,
-      eggplant: 1,
-      glowshroom: 1,
-      grape: 1,
-      mango: 1,
-      "moon blossom": 1,
-      "moon melon": 1,
-      moonflower: 1,
-      mushroom: 1,
-      nightshade: 1,
-      orangetulip: 1,
-      papaya: 1,
-      passionfruit: 1,
-      pear: 1,
-      peach: 1,
-      pepper: 1,
-      pumpkin: 1,
-      raspberry: 1,
-      soulfruit: 1,
-      strawberry: 1,
-      tomato: 1,
-      watermelon: 1,
-    };
+  // Plant list with example base prices (you can adjust these)
+  const plants = {
+    "apple": 5,
+    "banana": 4,
+    "bamboo": 3,
+    "beanstalk": 7,
+    "blood banana": 6,
+    "blueberry": 5,
+    "cactus": 4,
+    "cacao": 6,
+    "carrot": 3,
+    "corn": 3,
+    "cranberry": 5,
+    "coconut": 7,
+    "daffodil": 2,
+    "dragonfruit": 8,
+    "durian": 10,
+    "eggplant": 4,
+    "glowshroom": 6,
+    "grape": 5,
+    "mango": 7,
+    "moon blossom": 6,
+    "moon melon": 7,
+    "moonflower": 6,
+    "mushroom": 3,
+    "nightshade": 5,
+    "orangetulip": 2,
+    "papaya": 6,
+    "passionfruit": 7,
+    "pear": 5,
+    "peach": 6,
+    "pepper": 4,
+    "pumpkin": 5,
+    "raspberry": 5,
+    "soulfruit": 9,
+    "strawberry": 5,
+    "tomato": 4,
+    "watermelon": 7
+  };
 
-    // Multipliers for mutations
-    const mutationMultipliers = {
-      "": 1,
-      Golden: 20,
-      Rainbow: 50,
-    };
+  // Mutation multipliers
+  const growthMutations = {
+    none: 1,
+    golden: 20,
+    rainbow: 50
+  };
 
-    // Environmental multipliers
-    const envMultipliers = {
-      wet: 1.2,
-      chilled: 1.1,
-      frozen: 1.3,
-    };
+  const envMutations = {
+    wet: 2,
+    chilled: 2,
+    chocolate: 2,
+    moonlit: 2,
+    bloodlit: 4,
+    plasma: 5,
+    frozen: 10,
+    zombified: 25,
+    twisted: 30,
+    shocked: 100,
+    celestial: 120,
+    disco: 125
+  };
 
-    // Elements
-    const plantSelect = document.getElementById("plant");
-    const weightInput = document.getElementById("weight");
-    const mutationSelect = document.getElementById("mutation");
-    const wetCheckbox = document.getElementById("wet");
-    const chilledCheckbox = document.getElementById("chilled");
-    const frozenCheckbox = document.getElementById("frozen");
-    const resultDiv = document.getElementById("result");
-    const warningDiv = document.getElementById("warning");
-    const calculateBtn = document.getElementById("calculateBtn");
-    const toggleThemeBtn = document.getElementById("toggleThemeBtn");
+  // Environmental stacking bonuses (added to 1 in formula)
+  const envStackBonus = {
+    wet: 1,
+    chilled: 1,
+    chocolate: 1,
+    moonlit: 1,
+    bloodlit: 3,
+    plasma: 4,
+    frozen: 9,
+    zombified: 24,
+    shocked: 99,
+    celestial: 119,
+    disco: 124,
+    twisted: 0 // unclear, treat as 0 or add if you want
+  };
 
-    // Dark mode toggle
-    toggleThemeBtn.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-      toggleThemeBtn.textContent = document.body.classList.contains("dark") ? "☀️ Toggle Light Mode" : "🌙 Toggle Dark Mode";
+  // Restrictions:
+  // Only one of Golden or Rainbow growth mutation
+  // Only one of Wet, Chilled, or Frozen env mutations
+
+  // Populate plant select with options
+  const plantSelect = document.getElementById("plant");
+  Object.entries(plants).forEach(([name, price]) => {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name[0].toUpperCase() + name.slice(1);
+    plantSelect.appendChild(option);
+  });
+
+  // Set base price input based on selected plant
+  const basePriceInput = document.getElementById("basePrice");
+  function updateBasePrice() {
+    const plant = plantSelect.value;
+    basePriceInput.value = plants[plant] || 0;
+  }
+  plantSelect.addEventListener("change", () => {
+    updateBasePrice();
+    calculate();
+  });
+
+  basePriceInput.addEventListener("input", calculate);
+
+  // Mutation inputs and event handlers
+  const growthRadios = document.querySelectorAll('input[name="growth"]');
+  const envCheckboxes = document.querySelectorAll('input[name="env"]');
+
+  growthRadios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      updateRestrictions();
+      calculate();
     });
+  });
 
-    // Enforce mutation conflicts (Golden vs Rainbow)
-    mutationSelect.addEventListener("change", () => {
-      const val = mutationSelect.value;
-      if (val === "Golden") {
-        // If Golden selected, disable Rainbow environmental check? Actually, Rainbow is mutation only, so no env. conflict
-        // No direct conflict with environment checkboxes here, only between Golden and Rainbow mutation (mutually exclusive select)
-        // So nothing needed here.
-      }
-      if (val === "Rainbow") {
-        // same as above, no direct conflicts in env checkboxes
-      }
+  envCheckboxes.forEach(cb => {
+    cb.addEventListener("change", () => {
+      updateRestrictions();
+      calculate();
     });
+  });
 
-    // Enforce exclusivity between environmental checkboxes: wet, chilled, frozen (only one allowed)
-    function enforceEnvExclusivity(changedCheckbox) {
-      if (changedCheckbox.checked) {
-        if (changedCheckbox === wetCheckbox) {
-          chilledCheckbox.checked = false;
-          frozenCheckbox.checked = false;
-          chilledCheckbox.disabled = true;
-          frozenCheckbox.disabled = true;
-          wetCheckbox.disabled = false;
-        } else if (changedCheckbox === chilledCheckbox) {
-          wetCheckbox.checked = false;
-          frozenCheckbox.checked = false;
-          wetCheckbox.disabled = true;
-          frozenCheckbox.disabled = true;
-          chilledCheckbox.disabled = false;
-        } else if (changedCheckbox === frozenCheckbox) {
-          wetCheckbox.checked = false;
-          chilledCheckbox.checked = false;
-          wetCheckbox.disabled = true;
-          chilledCheckbox.disabled = true;
-          frozenCheckbox.disabled = false;
+  // Update disabled state of checkboxes based on restrictions
+  function updateRestrictions() {
+    const growthSelected = Array.from(growthRadios).find(r => r.checked)?.value || "none";
+    const envSelected = Array.from(envCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+
+    // Restrict Golden and Rainbow mutually exclusive: handled by radio inputs - no disable needed
+
+    // Restrict only one of wet, chilled, frozen
+    const wetChilledFrozen = ["wet", "chilled", "frozen"];
+    const selectedWetChilledFrozen = envSelected.filter(m => wetChilledFrozen.includes(m));
+
+    envCheckboxes.forEach(cb => {
+      if (wetChilledFrozen.includes(cb.value)) {
+        if (selectedWetChilledFrozen.length === 1 && !cb.checked) {
+          cb.disabled = true;
+        } else {
+          cb.disabled = false;
         }
       } else {
-        // none checked, enable all
-        wetCheckbox.disabled = false;
-        chilledCheckbox.disabled = false;
-        frozenCheckbox.disabled = false;
+        cb.disabled = false;
       }
+    });
+  }
+
+  // Show warnings if restrictions violated (should not happen if disabling works)
+  function checkWarnings() {
+    const growthSelected = Array.from(growthRadios).find(r => r.checked)?.value || "none";
+    const envSelected = Array.from(envCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+
+    const warnings = [];
+
+    // Golden vs Rainbow
+    if (growthSelected === "golden" && growthSelected === "rainbow") {
+      warnings.push("Cannot select both Golden and Rainbow mutations.");
     }
 
-    wetCheckbox.addEventListener("change", () => enforceEnvExclusivity(wetCheckbox));
-    chilledCheckbox.addEventListener("change", () => enforceEnvExclusivity(chilledCheckbox));
-    frozenCheckbox.addEventListener("change", () => enforceEnvExclusivity(frozenCheckbox));
-
-    // Enforce Golden vs Rainbow in mutation select - mutually exclusive already, but just in case
-    // It's a select dropdown, so only one can be chosen anyway.
-
-    // Main calculation function
-    function calculateCost() {
-      warningDiv.style.display = "none";
-      resultDiv.style.display = "none";
-      warningDiv.textContent = "";
-      resultDiv.textContent = "";
-
-      let plant = plantSelect.value;
-      let weight = parseFloat(weightInput.value);
-      let mutation = mutationSelect.value;
-
-      if (!plantBasePrices.hasOwnProperty(plant)) {
-        warningDiv.style.display = "block";
-        warningDiv.textContent = `⚠️ Invalid plant selected.`;
-        return;
-      }
-
-      if (isNaN(weight) || weight <= 0) {
-        warningDiv.style.display = "block";
-        warningDiv.textContent = `⚠️ Please enter a valid weight greater than 0.`;
-        return;
-      }
-
-      // Base price per kg
-      let basePrice = plantBasePrices[plant];
-
-      // Calculate base cost
-      let cost = basePrice * weight;
-
-      // Apply mutation multiplier
-      let mutationMultiplier = mutationMultipliers[mutation] || 1;
-      cost *= mutationMultiplier;
-
-      // Apply environment multipliers (only one allowed due to exclusivity)
-      if (wetCheckbox.checked) cost *= envMultipliers.wet;
-      else if (chilledCheckbox.checked) cost *= envMultipliers.chilled;
-      else if (frozenCheckbox.checked) cost *= envMultipliers.frozen;
-
-      cost = +cost.toFixed(2);
-
-      // Show cost
-      let envEffect = wetCheckbox.checked ? "Wet" :
-                      chilledCheckbox.checked ? "Chilled" :
-                      frozenCheckbox.checked ? "Frozen" : "None";
-
-      let mutationText = mutation ? mutation + ` (×${mutationMultiplier})` : "None";
-
-      resultDiv.style.display = "block";
-      resultDiv.innerHTML = `
-        <strong>Plant:</strong> ${plant} <br />
-        <strong>Weight:</strong> ${weight} kg <br />
-        <strong>Growth Mutation:</strong> ${mutationText} <br />
-        <strong>Environmental Effect:</strong> ${envEffect} <br />
-        <strong>Total Cost:</strong> $${cost.toLocaleString()}
-      `;
-
-      // Warnings
-      let warnings = [];
-
-      if (mutation === "Golden" && envEffect === "Frozen") {
-        warnings.push("Golden mutation combined with Frozen environment may reduce quality.");
-      }
-      if (mutation === "Rainbow" && wetCheckbox.checked) {
-        warnings.push("Rainbow mutation combined with Wet environment can cause instability.");
-      }
-      if (weight > 1000) {
-        warnings.push("High weight value: double-check your input.");
-      }
-
-      if (warnings.length > 0) {
-        warningDiv.style.display = "block";
-        warningDiv.textContent = warnings.join("\n");
-      }
+    // Wet, Chilled, Frozen mutually exclusive
+    const wetChilledFrozen = ["wet", "chilled", "frozen"];
+    const selectedWetChilledFrozen = envSelected.filter(m => wetChilledFrozen.includes(m));
+    if (selectedWetChilledFrozen.length > 1) {
+      warnings.push("Only one of Wet, Chilled, or Frozen can be selected.");
     }
 
-    calculateBtn.addEventListener("click", calculateCost);
+    const warningEl = document.getElementById("warning");
+    if (warnings.length) {
+      warningEl.style.display = "block";
+      warningEl.textContent = warnings.join(" ");
+    } else {
+      warningEl.style.display = "none";
+      warningEl.textContent = "";
+    }
+  }
 
-    // Initial setup
-    enforceEnvExclusivity({ checked: false });
+  // Calculate final price
+  function calculate() {
+    checkWarnings();
 
-  })();
+    const plant = plantSelect.value;
+    let basePrice = parseFloat(basePriceInput.value);
+    if (isNaN(basePrice) || basePrice < 0) {
+      basePrice = 0;
+      basePriceInput.value = 0;
+    }
+
+    const growthSelected = Array.from(growthRadios).find(r => r.checked)?.value || "none";
+    const envSelected = Array.from(envCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+
+    // Calculate growth multiplier
+    const growthMultiplier = growthMutations[growthSelected] || 1;
+
+    // Calculate environmental multiplier
+    // Sum base multipliers and add stacking bonuses (formula is (sum multipliers + sum bonuses) * growthMultiplier * basePrice)
+    // According to your earlier description:
+    // Total = (GrowthMutation * BasePrice * (Sum of EnvMultipliers + Sum of EnvStackBonus))
+
+    let envMultSum = 0;
+    let envBonusSum = 0;
+
+    envSelected.forEach(mutation => {
+      envMultSum += (envMutations[mutation] || 0);
+      envBonusSum += (envStackBonus[mutation] || 0);
+    });
+
+    // If no env mutation selected, multiplier + bonus = 1 for neutral effect
+    if (envSelected.length === 0) {
+      envMultSum = 1;
+      envBonusSum = 0;
+    }
+
+    const total = growthMultiplier * basePrice * (envMultSum + envBonusSum);
+
+    const resultEl = document.getElementById("result");
+    resultEl.style.display = "block";
+    resultEl.textContent = `Final Plant Price: ${total.toFixed(2)} Gold`;
+
+    updateRestrictions();
+  }
+
+  // Initialize
+  updateBasePrice();
+  calculate();
 </script>
 
 </body>
