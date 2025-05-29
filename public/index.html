@@ -1,276 +1,120 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GrowAGarden Calculator</title>
-<style>
-  body {
-    background: #e6f9ee;
-    font-family: 'Segoe UI', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2em;
-  }
-  h1 {
-    color: #248f50;
-    font-size: 2rem;
-  }
-  .calculator {
-    background: white;
-    padding: 1.5em;
-    border-radius: 1em;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    max-width: 400px;
-    width: 100%;
-  }
-  label {
-    display: block;
-    margin: 0.75em 0 0.25em;
-    font-weight: bold;
-  }
-  input, select, button {
-    width: 100%;
-    padding: 0.6em;
-    margin-bottom: 1em;
-    border: 1px solid #ccc;
-    border-radius: 0.4em;
-    font-size: 1em;
-  }
-  button {
-    background-color: #31a76d;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  button:hover {
-    background-color: #278e5a;
-  }
-  .result {
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #333;
-    margin-top: 1em;
-  }
-</style>
-</head>
-<body>
+import { useState, useEffect } from "react";
 
-<h1>🌱 GrowAGarden Calculator</h1>
-<div class="calculator">
-  <label for="plant">Plant Type</label>
-  <select id="plant">
-    <option value="apple">Apple</option>
-    <option value="banana">Banana</option>
-    <option value="bamboo">Bamboo</option>
-    <option value="beanstalk">Beanstalk</option>
-    <option value="blood banana">Blood Banana</option>
-    <option value="blueberry">Blueberry</option>
-    <option value="cactus">Cactus</option>
-    <option value="cacao">Cacao</option>
-    <option value="carrot">Carrot</option>
-    <option value="corn">Corn</option>
-    <option value="cranberry">Cranberry</option>
-    <option value="coconut">Coconut</option>
-    <option value="daffodil">Daffodil</option>
-    <option value="dragonfruit">Dragonfruit</option>
-    <option value="durian">Durian</option>
-    <option value="eggplant">Eggplant</option>
-    <option value="glowshroom">Glowshroom</option>
-    <option value="grape">Grape</option>
-    <option value="mango">Mango</option>
-    <option value="moon blossom">Moon Blossom</option>
-    <option value="moon melon">Moon Melon</option>
-    <option value="moonflower">Moonflower</option>
-    <option value="mushroom">Mushroom</option>
-    <option value="nightshade">Nightshade</option>
-    <option value="orangetulip">Orange Tulip</option>
-    <option value="papaya">Papaya</option>
-    <option value="passionfruit">Passionfruit</option>
-    <option value="pear">Pear</option>
-    <option value="peach">Peach</option>
-    <option value="pepper">Pepper</option>
-    <option value="pumpkin">Pumpkin</option>
-    <option value="raspberry">Raspberry</option>
-    <option value="soulfruit">Soulfruit</option>
-    <option value="strawberry">Strawberry</option>
-    <option value="tomato">Tomato</option>
-    <option value="watermelon">Watermelon</option>
-  </select>
+const mutationMultipliers = {
+  Golden: 20,
+  Rainbow: 50,
+  None: 1,
+};
 
-  <label for="modifiers">Modifiers (hold Ctrl/Cmd to select multiple)</label>
-  <select id="modifiers" multiple size="6">
-    <option value="rainbow">🌈 Rainbow</option>
-    <option value="gold">🥇 Gold</option>
-    <option value="shocked">⚡ Shocked</option>
-    <option value="frozen">❄️ Frozen</option>
-    <option value="wet">💧 Wet</option>
-    <option value="chilled">🧊 Chilled</option>
-    <option value="choc">🍫 Choc</option>
-    <option value="moonlit">🌙 Moonlit</option>
-    <option value="bloodlit">🩸 Bloodlit</option>
-    <option value="celestial">✨ Celestial</option>
-    <option value="disco">🪩 Disco</option>
-    <option value="zomb plasma">🧟 Zomb Plasma</option>
-  </select>
+const environmentStacks = {
+  Shocked: 99,
+  Frozen: 9,
+  Wet: 1,
+  Chilled: 1,
+  Chocolate: 1,
+  Moonlit: 1,
+  Disco: 124,
+  Celestial: 119,
+  Bloodlit: 3,
+  Zombified: 24,
+  Plasma: 4,
+};
 
-  <label for="weight">Weight (kg)</label>
-  <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42" />
+const restrictedGrowthMutations = ["Golden", "Rainbow"];
+const restrictedEnvironmentals = ["Wet", "Chilled", "Frozen"];
 
-  <button onclick="calculate()">💰 Calculate</button>
-  <div class="result" id="price">Estimated Price: —</div>
-  <button id="reportWrongBtn" style="display:none;">Report Wrong Price</button>
-</div>
+export default function GrowAGardenCalculator() {
+  const [baseValue, setBaseValue] = useState(1);
+  const [growthMutation, setGrowthMutation] = useState("None");
+  const [selectedStacks, setSelectedStacks] = useState<string[]>([]);
+  const [totalValue, setTotalValue] = useState(0);
+  const [warnings, setWarnings] = useState<string[]>([]);
 
-<script>
-  // Your known price data
-  // Each entry: {plant: string, modifiers: array, weight: number, price: number (in $)}
-  // Sorted by weight ascending within plant+modifiers
-  const priceData = [
-    {plant: "strawberry", modifiers: ["frozen"], weight: 0.25, price: 135},
-    {plant: "dragonfruit", modifiers: ["moonlit","wet"], weight: 1, price: 12861}, // weight assumed 1 for no weight given, will fix later
-    {plant: "strawberry", modifiers: ["wet"], weight: 0.26, price: 27},
-    {plant: "strawberry", modifiers: [], weight: 0.23, price: 14},
-    {plant: "dragonfruit", modifiers: ["wet"], weight: 12.56, price: 10414},
-    {plant: "celestialberry", modifiers: [], weight: 2.13, price: 9040},
-    {plant: "celestialberry", modifiers: ["wet"], weight: 2.30, price: 21123},
-    {plant: "coconut", modifiers: ["shocked"], weight: 18.72, price: 71503},
-    {plant: "coconut", modifiers: ["wet","shocked"], weight: 15.88, price: 51953},
-    {plant: "coconut", modifiers: ["wet","gold"], weight: 18.83, price: 28944},
-    {plant: "durian", modifiers: [], weight: 46.20, price: 166789},
-    {plant: "cranberry", modifiers: ["disco","wet"], weight: 1.24, price: 384357},
-    {plant: "glowshroom", modifiers: ["wet"], weight: 0.73, price: 574},
-    {plant: "moonflower", modifiers: ["wet"], weight: 2.11, price: 21147},
-    {plant: "mushroom", modifiers: ["frozen","shocked"], weight: 1, price: 14854248}, // weight assumed 1
-    {plant: "beanstalk", modifiers: ["wet"], weight: 12.86, price: 66152},
-    {plant: "mango", modifiers: ["wet"], weight: 17.50, price: 17705},
-    {plant: "blueberry", modifiers: ["wet"], weight: 0.22, price: 49},
-    {plant: "blueberry", modifiers: ["wet","gold"], weight: 0.27, price: 1471},
-    {plant: "blood banana", modifiers: ["wet"], weight: 1.95, price: 20374},
-    {plant: "blood banana", modifiers: [], weight: 2.09, price: 11676},
-    {plant: "corn", modifiers: ["wet"], weight: 2.49, price: 124},
-    {plant: "apple", modifiers: ["wet"], weight: 3.36, price: 691},
-    {plant: "tomato", modifiers: ["wet"], weight: 0.67, price: 109},
-    {plant: "durian", modifiers: ["bloodlit","wet"], weight: 8.48, price: 28090},
-    {plant: "durian", modifiers: ["celestial","wet"], weight: 8.81, price: 733382},
-    {plant: "tomato", modifiers: [], weight: 0.68, price: 56},
-    {plant: "mushroom", modifiers: ["choc","wet","shocked"], weight: 1, price: 100000}, // just example
-  ];
+  useEffect(() => {
+    const multiplier = mutationMultipliers[growthMutation] || 1;
+    const stackSum = selectedStacks.reduce((sum, key) => sum + (environmentStacks[key] || 0), 0);
+    const result = baseValue * multiplier * (1 + stackSum);
+    setTotalValue(result);
+  }, [baseValue, growthMutation, selectedStacks]);
 
-  // Normalize data - make modifiers always sorted alphabetically for matching
-  priceData.forEach(d => d.modifiers.sort());
+  useEffect(() => {
+    const newWarnings: string[] = [];
 
-  function arraysEqual(a,b) {
-    if(a.length !== b.length) return false;
-    for(let i=0; i<a.length; i++){
-      if(a[i] !== b[i]) return false;
-    }
-    return true;
-  }
-
-  function findMatchingData(plant, modifiers) {
-    modifiers = modifiers.slice().sort();
-    // Get all entries for this plant and modifiers exactly
-    return priceData.filter(d => d.plant === plant && arraysEqual(d.modifiers, modifiers));
-  }
-
-  // Linear interpolation helper
-  // Given x0,y0 and x1,y1 and x, return y
-  function lerp(x0,y0,x1,y1,x){
-    if(x1 === x0) return y0; // avoid div by zero
-    return y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
-  }
-
-  // Find estimated price given plant, modifiers, weight
-  function estimatePrice(plant, modifiers, weight) {
-    // Find all known data for plant+modifiers
-    const matches = findMatchingData(plant, modifiers);
-
-    if(matches.length === 0){
-      // No exact modifier match, try no modifiers for plant
-      const baseMatches = findMatchingData(plant, []);
-      if(baseMatches.length === 0){
-        return null; // no data at all for plant
-      } else {
-        // fallback: average price/kg from baseMatches * weight
-        let totalPrice = 0, totalWeight = 0;
-        baseMatches.forEach(m => {
-          totalPrice += m.price;
-          totalWeight += m.weight;
-        });
-        let avgPricePerKg = totalPrice / totalWeight;
-        return avgPricePerKg * weight;
-      }
+    const activeRestrictedEnvironmentals = restrictedEnvironmentals.filter(e => selectedStacks.includes(e));
+    if (activeRestrictedEnvironmentals.length > 1) {
+      newWarnings.push("Only one of Wet, Chilled, or Frozen may be active at a time.");
     }
 
-    // Sort by weight ascending
-    matches.sort((a,b) => a.weight - b.weight);
-
-    // If weight less than smallest known weight, extrapolate down
-    if(weight <= matches[0].weight) {
-      let p = matches[0].price / matches[0].weight * weight;
-      return p;
+    if (growthMutation === "Golden" && selectedStacks.includes("Rainbow")) {
+      newWarnings.push("You can only apply either Golden or Rainbow, not both.");
+    } else if (growthMutation === "Rainbow" && selectedStacks.includes("Golden")) {
+      newWarnings.push("You can only apply either Golden or Rainbow, not both.");
     }
 
-    // If weight greater than largest known weight, extrapolate up
-    if(weight >= matches[matches.length - 1].weight) {
-      let p = matches[matches.length - 1].price / matches[matches.length - 1].weight * weight;
-      return p;
-    }
+    setWarnings(newWarnings);
+  }, [growthMutation, selectedStacks]);
 
-    // Find two nearest weights around input weight for interpolation
-    for(let i=0; i<matches.length - 1; i++) {
-      if(weight >= matches[i].weight && weight <= matches[i+1].weight) {
-        return lerp(
-          matches[i].weight, matches[i].price,
-          matches[i+1].weight, matches[i+1].price,
-          weight
-        );
-      }
-    }
+  const toggleStack = (key: string) => {
+    setSelectedStacks(prev =>
+      prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]
+    );
+  };
 
-    // If no interpolation found (should not happen), fallback average price/kg
-    let totalPrice = 0, totalWeight = 0;
-    matches.forEach(m => {
-      totalPrice += m.price;
-      totalWeight += m.weight;
-    });
-    let avgPricePerKg = totalPrice / totalWeight;
-    return avgPricePerKg * weight;
-  }
+  return (
+    <div className="p-4 max-w-xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">GrowAGarden Plant Cost Calculator</h1>
 
-  function calculate() {
-    const plant = document.getElementById('plant').value.toLowerCase();
-    const modifiersSelect = document.getElementById('modifiers');
-    const selectedModifiers = [...modifiersSelect.selectedOptions].map(o => o.value.toLowerCase());
-    const weightInput = parseFloat(document.getElementById('weight').value);
+      <div className="mb-4">
+        <label className="block mb-1 font-medium">Base Value:</label>
+        <input
+          type="number"
+          value={baseValue}
+          onChange={(e) => setBaseValue(Number(e.target.value))}
+          className="border rounded px-2 py-1 w-full"
+        />
+      </div>
 
-    if(!plant){
-      alert('Please select a plant type.');
-      return;
-    }
-    if(isNaN(weightInput) || weightInput <= 0){
-      alert('Please enter a valid positive weight.');
-      return;
-    }
+      <div className="mb-4">
+        <label className="block mb-1 font-medium">Growth Mutation:</label>
+        <select
+          value={growthMutation}
+          onChange={(e) => setGrowthMutation(e.target.value)}
+          className="border rounded px-2 py-1 w-full"
+        >
+          {Object.keys(mutationMultipliers).map((key) => (
+            <option key={key} value={key}>{key}</option>
+          ))}
+        </select>
+      </div>
 
-    // Calculate estimated price
-    const price = estimatePrice(plant, selectedModifiers, weightInput);
+      <div className="mb-4">
+        <label className="block mb-1 font-medium">Environmental Stacks:</label>
+        <div className="grid grid-cols-2 gap-2">
+          {Object.entries(environmentStacks).map(([key, val]) => (
+            <label key={key} className="flex items-center">
+              <input
+                type="checkbox"
+                checked={selectedStacks.includes(key)}
+                onChange={() => toggleStack(key)}
+                className="mr-2"
+              />
+              {key} ({val}x)
+            </label>
+          ))}
+        </div>
+      </div>
 
-    const priceDiv = document.getElementById('price');
-    if(price === null) {
-      priceDiv.textContent = Estimated Price: No data available;
-    } else {
-      priceDiv.textContent = Estimated Price: $${price.toFixed(2)};
-    }
+      {warnings.length > 0 && (
+        <div className="bg-yellow-100 text-yellow-800 p-2 mb-4 rounded">
+          {warnings.map((w, idx) => (
+            <div key={idx}>{w}</div>
+          ))}
+        </div>
+      )}
 
-    // Show the report wrong price button only if we have an estimated price
-    document.getElementById('reportWrongBtn').style.display = price !== null ? 'inline-block' : 'none';
-  }
-
-</script>
-
-</body>
-</html>
+      <div className="text-lg font-semibold">
+        Total Value: <span className="text-green-600">{totalValue.toLocaleString()}x</span>
+      </div>
+    </div>
+  );
+}
