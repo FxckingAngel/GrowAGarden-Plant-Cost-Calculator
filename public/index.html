@@ -1,308 +1,536 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>GrowAGarden Plant Cost Calculator – AI & Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GrowAGarden Plant Cost Calculator with AI Feedback & Sync</title>
+  <link rel="icon" href="./logo.png" type="image/png" />
+  <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      background: linear-gradient(to bottom, #e8fff1, #c7f5df);
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2em;
-    }
-    h1 {
-      color: #228b57;
-      font-size: 2.2rem;
-      margin-bottom: 1em;
-      text-align: center;
-    }
-    .calculator {
-      background: white;
-      padding: 2em;
-      border-radius: 1em;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-      max-width: 600px;
-      width: 100%;
-    }
-    label {
-      display: block;
-      margin: 1em 0 0.3em;
-      font-weight: 600;
-      font-size: 1.05em;
-      color: #333;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 0.65em;
-      margin-bottom: 1em;
-      border: 1px solid #ccc;
-      border-radius: 0.5em;
-      font-size: 1em;
-      box-sizing: border-box;
-    }
-    select[multiple] {
-      height: 10em;
-    }
-    button {
-      background-color: #34c274;
-      color: white;
-      font-weight: bold;
-      border: none;
-      transition: background 0.2s ease;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #2aa363;
-    }
-    .result {
-      font-size: 1.3em;
-      font-weight: bold;
-      color: #2c2c2c;
-      margin-top: 1em;
-      text-align: center;
-    }
-    .breakdown {
-      margin-top: 1em;
-      font-size: 0.9em;
-      color: #444;
-      background: #f7f7f7;
-      padding: 1em;
-      border-radius: 0.5em;
-    }
-    .feedback-buttons {
-      margin-top: 1em;
-      display: flex;
-      justify-content: center;
-      gap: 1em;
-    }
-    .feedback-buttons button {
-      width: auto;
-      padding: 0.5em 1em;
-    }
-    #correctionInput {
+    /* Admin overlay & modal for secure admin visualization */
+    #adminModal {
       display: none;
-      margin-top: 1em;
+      position: fixed;
+      z-index: 10;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(10,10,10,0.5);
+      justify-content: center; align-items: center;
     }
-    footer {
-      margin-top: 3em;
-      font-size: 0.9em;
-      color: #666;
+    #adminPanel {
+      max-width: 90vw; width: 600px; background: #fff; border-radius: 1em;
+      box-shadow: 0 12px 25px rgba(34,139,87,.18);
+      padding: 2em; position: relative;
+    }
+    #adminPanel h2 { color: #228b57; }
+    #closeAdmin { position: absolute; right: 2em; top: 2em; background: #eee; padding: .5em 1em; border-radius: .5em; cursor: pointer; }
+    #adminList { margin: 2em 0; max-height: 260px; overflow: auto; }
+    .admin-row { border-bottom: 1px solid #eee; padding: .5em; display: flex; justify-content: space-between; align-items: center; }
+    .admin-row:last-child { border-bottom: none; }
+    .admin-actions button { margin-left: 0.5em; }
+    .trend-chart { width: 100%; height: 150px; margin-top: 1em; }
+    .filter-box { margin: 0.5em 0 1.5em; }
+    .hidden { display: none !important; }
+    #adminLogin {
+      position: fixed;
+      z-index: 20;
+      left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(20,20,20,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #adminLoginPanel {
+      width: 320px; background: white; border-radius: 12px; padding: 2em 2em;
+      box-shadow: 0 8px 36px #393;
       text-align: center;
-      max-width: 600px;
     }
-    #confidence {
-      margin-top: 0.5em;
-      font-size: 0.85em;
-      color: #555;
-      text-align: center;
+    #adminLoginPanel input { width: 80%; }
+    #adminLoginPanel button { width: 60%; }
+    @media (max-width:800px) {
+      #adminPanel, .calculator { padding: 1em; }
+      .trend-chart { height: 100px; }
     }
+    /* For admin visual cues */
+    .admin-row.highlight { background: #e8fff1; }
+    /* Extra context for feedback, etc */
+    .feedback-bar { background: #e4f9e7; padding: .7em 1em; margin-top: 1em; border-radius: .5em; color: #15743c; }
+    .danger { color: #e41a2e; }
+    .success { color: #228b57; }
   </style>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <h1>🌿 GrowAGarden Plant Cost Calculator with AI Feedback & Sync</h1>
-  <div class="calculator">
-    <label for="fruit">Choose Plant</label>
-    <select id="fruit">
-      <option>Apple</option>
-      <option>Banana</option>
-      <option>Blueberry</option>
-      <option>Celestlberry</option>
-      <option>Coconut</option>
-      <option>Corn</option>
-      <option>Dragonfruit</option>
-      <option>Durian</option>
-      <option>Mushroom</option>
-      <option>Strawberry</option>
-      <!-- Add more as needed -->
-    </select>
+  <h1>🌿 GrowAGarden Plant Cost Calculator with AI & Admin Panel</h1>
+  <div class="calculator" id="mainCalculator">
+    <label for="plantType">Plant Type</label>
+    <select id="plantType"></select>
 
-    <label for="weight">Enter Weight (kg)</label>
-    <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42">
+    <label for="plantWeight">Weight (kg)</label>
+    <input type="number" id="plantWeight" step="0.01" value="1" min="0.01">
 
-    <label for="modifiers">Select Modifiers (Ctrl/Cmd for multi)</label>
-    <select id="modifiers" multiple>
-      <option value="rainbow">🌈 Rainbow</option>
-      <option value="gold">🥇 Gold</option>
-      <option value="shocked">⚡ Shocked</option>
-      <option value="frozen">❄️ Frozen</option>
-      <option value="wet">💧 Wet</option>
-      <option value="chilled">🧊 Chilled</option>
-      <option value="choc">🍫 Choc</option>
-      <option value="moonlit">🌙 Moonlit</option>
-      <option value="bloodlit">🩸 Bloodlit</option>
-      <option value="celestial">✨ Celestial</option>
-      <option value="disco">🕺 Disco</option>
-      <option value="zomb">🧟 Zomb</option>
-      <option value="plasma">🔋 Plasma</option>
-    </select>
+    <label for="modifiers">Modifiers (Ctrl/Cmd for multi)</label>
+    <select id="modifiers" multiple></select>
 
-    <button id="calcBtn">💰 Calculate Price</button>
-    <div class="result" id="price">Estimated Price: —</div>
+    <button id="calculateBtn">💰 Calculate Price</button>
+    <div class="result" id="priceResult">Estimated Price: —</div>
     <div id="confidence"></div>
     <div class="breakdown" id="breakdown"></div>
 
     <div class="feedback-buttons" id="feedbackButtons" style="display:none;">
-      <button id="btnAccurate">✔️ Price Accurate</button>
-      <button id="btnInaccurate">❌ Price Incorrect</button>
+      <button id="btnAccurate">✔️ Accurate</button>
+      <button id="btnInaccurate">❌ Not Accurate</button>
     </div>
 
-    <div id="correctionInput">
-      <label for="correctPrice">Enter Correct Price (in cents):</label>
-      <input type="number" id="correctPrice" step="1" min="1" placeholder="e.g. 1000" />
+    <div id="correctionInput" style="display:none;">
+      <label for="correctPrice">Enter Correct Price (Robux):</label>
+      <input type="number" id="correctPrice" min="1" step="0.01" />
       <button id="submitCorrection">Submit Correction</button>
     </div>
+    <button id="adminButton" style="margin-top:1.5em; width:auto; background:#19b081;">Admin Panel</button>
   </div>
 
   <footer>
     Not affiliated with Roblox or GrowAGarden. Made by fans 🌱<br/>
-    <small>AI confidence means how many times the price was confirmed accurate.</small>
+    <small>Validation: AI learning and admin-reviewed trusted corrections. Strict rules enforced. Modifiers/rare/seasonal plants have value floors.</small>
   </footer>
+  <!-- Admin Login -->
+  <div id="adminLogin">
+    <div id="adminLoginPanel">
+      <h2>Admin Login</h2>
+      <input type="password" id="adminPassword" placeholder="Password" /><br /><br />
+      <button id="adminLoginBtn">Log In</button>
+      <div id="adminLoginMsg" style="margin-top:1em; min-height:1.5em;" class="danger"></div>
+    </div>
+  </div>
+  <!-- Admin Modal/Panel -->
+  <div id="adminModal">
+    <div id="adminPanel">
+      <span id="closeAdmin">Close</span>
+      <h2>Admin Trusted Data & Trend</h2>
+      <div class="filter-box">
+        Filter: <input id="adminFilter" type="text" placeholder="Plant name/type/modifier...">
+      </div>
+      <div id="adminList"></div>
+      <canvas id="trendChart" class="trend-chart"></canvas>
+      <div style="margin-top:1em;">
+        <strong>Correction Queue:</strong>
+        <ul id="correctionQueue" style="list-style:none; padding-left:0;"></ul>
+      </div>
+    </div>
+  </div>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <!-- Chart.js for trend graphing -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- The main logic and behavior -->
+  <script>
+  // ------------------ Configuration Data -------------------
+  // You may modify this base data as needed!
+  const PLANTS = [
+    { type: "Apple", base: 100 },
+    { type: "Banana", base: 110 },
+    { type: "Blueberry", base: 180 },
+    { type: "Celestlberry", base: 2000 },
+    { type: "Coconut", base: 100 },
+    { type: "Corn", base: 50 },
+    { type: "Dragonfruit", base: 120 },
+    { type: "Durian", base: 500 },
+    { type: "Strawberry", base: 63 },
+    { type: "Mushroom", base: 10000 },
+    { type: "Orchid", base: 3000 },
+    { type: "Rose", base: 250 }
+    // Add more as needed
+  ];
+  // Alphabetical
+  PLANTS.sort((a,b) => a.type.localeCompare(b.type));
+  const MODIFIERS = [
+    { value:"rainbow", label:"🌈 Rainbow", multiplier:1.5 },
+    { value:"gold", label:"🥇 Gold", multiplier:2.0 },
+    { value:"shocked", label:"⚡ Shocked", multiplier:2.1 },
+    { value:"frozen", label:"❄️ Frozen", multiplier:1.6 },
+    { value:"wet", label:"💧 Wet", multiplier:1.1 },
+    { value:"chilled", label:"🧊 Chilled", multiplier:1.1 },
+    { value:"choc", label:"🍫 Choc", multiplier:1.4 },
+    { value:"moonlit", label:"🌙 Moonlit", multiplier:1.4 },
+    { value:"bloodlit", label:"🩸 Bloodlit", multiplier:1.6 },
+    { value:"celestial", label:"✨ Celestial", multiplier:5 },
+    { value:"disco", label:"🕺 Disco", multiplier:3.5 },
+    { value:"zomb", label:"🧟 Zomb", multiplier:1.3 },
+    { value:"plasma", label:"🔋 Plasma", multiplier:1.7 },
+    { value:"rare", label:"⭐ Rare", multiplier:2.2 },
+    { value:"seasonal", label:"🎉 Seasonal", multiplier:1.13 },
+    { value:"trimmed", label:"✂️ Trimmed", multiplier:0.93 },
+    { value:"dried", label:"🌾 Dried", multiplier:0.64 }
+  ];
+  // Validation rules (strict mins, accepted margin %, etc)
+  const STRICT_MODIFIER_MIN = {
+    rare: 900,
+    dried: 60,
+  };
+  const CORRECTION_MARGIN = 0.2; // ±20%
 
-<script>
-  // ✅ Firebase Config (replace with your actual config)
-const firebaseConfig = {
-  apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
-  authDomain: "growagardenplantcostcalculator.firebaseapp.com",
-  databaseURL: "https://growagardenplantcostcalculator-default-rtdb.firebaseio.com",
-  projectId: "growagardenplantcostcalculator",
-  storageBucket: "growagardenplantcostcalculator.firebasestorage.app",
-  messagingSenderId: "410113480248",
-  appId: "1:410113480248:web:72badb81206b458ecd38cd",
-  measurementId: "G-K7XD9NMRGZ"
-};
+  // Admin password (should be secure, non-trivial, and stored securely in production)
+  const ADMIN_PASS = "GrowAGardenAdmin2024!";
 
+  // ------------------ Firebase Setup ---------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
+    authDomain: "growagardenplantcostcalculator.firebaseapp.com",
+    databaseURL: "https://growagardenplantcostcalculator-default-rtdb.firebaseio.com",
+    projectId: "growagardenplantcostcalculator",
+    storageBucket: "growagardenplantcostcalculator.appspot.com",
+    messagingSenderId: "410113480248",
+    appId: "1:410113480248:web:72badb81206b458ecd38cd",
+    measurementId: "G-K7XD9NMRGZ"
+  };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-  const collection = db.collection("plant_prices");
+  const PLANTS_COLLECTION = db.collection("plant_prices");
+  const CORRECTION_QUEUE = db.collection("correction_queue");
 
-  // Local & Firebase learned prices
-  let learnedPrices = {};
-
-  // Load from Firebase into localStorage/learnedPrices
-  collection.get().then(snapshot => {
-    snapshot.forEach(doc => {
-      learnedPrices[doc.id] = doc.data();
-    });
-    localStorage.setItem('learnedPrices', JSON.stringify(learnedPrices));
-    calculate();
+  // ------------------ UI Initialization --------------------
+  // Populate plant types and modifiers
+  const plantTypeSel = document.getElementById("plantType");
+  const modifiersSel = document.getElementById("modifiers");
+  PLANTS.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.type;
+    opt.textContent = p.type;
+    plantTypeSel.appendChild(opt);
+  });
+  MODIFIERS.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.value;
+    opt.textContent = m.label;
+    modifiersSel.appendChild(opt);
   });
 
-  // Local fallback if Firebase fails
-  try {
-    learnedPrices = JSON.parse(localStorage.getItem('learnedPrices') || '{}');
-  } catch {
-    learnedPrices = {};
+  // ------------------ State & Local AI ---------------------
+  let trustedData = {}; // PlantType_ModStrings -> {base, confidence, history:[], confirmed:[]}
+  let correctionQueue = []; // {plant,weight,mods,price,submitted}
+  let adminLoggedIn = false;
+
+  // Helper to get modifier string (sorted for canonical)
+  function modString(mods) {
+    return mods.slice().sort().join(",");
   }
 
-  const basePrices = {
-    strawberry: 63, dragonfruit: 120, coconut: 100, durian: 500,
-    mushroom: 10000, blueberry: 180, tomato: 80, apple: 100,
-    corn: 50, celestlberry: 2000
-  };
-
-  const modifierMultipliers = {
-    rainbow: 1.5, gold: 2.0, shocked: 2.1, frozen: 1.6,
-    wet: 1.1, chilled: 1.1, choc: 1.4, moonlit: 1.4,
-    bloodlit: 1.6, celestial: 5, disco: 3.5, zomb: 1.3, plasma: 1.7
-  };
-
-  const fruitSelect = document.getElementById('fruit');
-  const weightInput = document.getElementById('weight');
-  const modifiersSelect = document.getElementById('modifiers');
-  const priceDiv = document.getElementById('price');
-  const breakdownDiv = document.getElementById('breakdown');
-  const confidenceDiv = document.getElementById('confidence');
-  const feedbackButtons = document.getElementById('feedbackButtons');
-  const btnAccurate = document.getElementById('btnAccurate');
-  const btnInaccurate = document.getElementById('btnInaccurate');
-  const correctionInput = document.getElementById('correctionInput');
-  const correctPriceInput = document.getElementById('correctPrice');
-  const submitCorrection = document.getElementById('submitCorrection');
-
-  function getMultiplier(mods) {
-    return mods.reduce((acc, mod) => acc * (modifierMultipliers[mod] || 1), 1);
+  // Load trusted/learned data from Firebase (and mirror to localStorage)
+  async function loadTrustedData() {
+    const snapshot = await PLANTS_COLLECTION.get();
+    trustedData = {};
+    snapshot.forEach(doc => {
+      trustedData[doc.id] = doc.data();
+    });
+    // Load correction queue
+    const corrSnap = await CORRECTION_QUEUE.get();
+    correctionQueue = [];
+    corrSnap.forEach(doc => correctionQueue.push({...doc.data(), id: doc.id}));
+  }
+  function storeTrustedLocal() {
+    localStorage.setItem('trustedPlantData', JSON.stringify(trustedData));
+  }
+  function loadTrustedLocal() {
+    trustedData = JSON.parse(localStorage.getItem('trustedPlantData') || '{}');
   }
 
+  // ------------------ Price Calculation Logic ---------------------
+  function calcPlantPrice(plantType, weight, modsArr, trusted = null) {
+    const plant = PLANTS.find(p => p.type === plantType);
+    let base = plant ? plant.base : 100;
+    if (trusted && trusted.base) {
+      base = trusted.base;
+    }
+    let price = base * weight;
+    let multBreakdown = [];
+    modsArr.forEach(modVal => {
+      const m = MODIFIERS.find(m => m.value === modVal);
+      if (m) {
+        multBreakdown.push(`${m.label}×${m.multiplier}`);
+        price *= m.multiplier;
+      }
+    });
+    // Strict minimums for some modifiers
+    modsArr.forEach(modVal => {
+      if (typeof STRICT_MODIFIER_MIN[modVal] === "number" && price < STRICT_MODIFIER_MIN[modVal]) {
+        price = STRICT_MODIFIER_MIN[modVal];
+      }
+    });
+    return {
+      price: Math.round(price*100)/100,
+      breakdown: {
+        base, weight, mods: modsArr, multBreakdown,
+        strictInfo: modsArr.filter(m => STRICT_MODIFIER_MIN[m]).map(m =>
+          `Min for ${m}: ${STRICT_MODIFIER_MIN[m]}`).join(" | ")
+      }
+    };
+  }
+
+  // --- Price correction plausibility: within ±20% of trusted, modifier restrictions, no nonsense (e.g., 1 Robux for rare) ---
+  function validateCorrection(plantType, weight, modsArr, userPrice, trusted) {
+    if (userPrice <= 0) return {ok:false, reason:"Invalid price."};
+    const aiEst = calcPlantPrice(plantType, weight, modsArr, trusted).price;
+    // Margin
+    if (trusted && trusted.base) {
+      const avg = aiEst;
+      const lower = avg * (1 - CORRECTION_MARGIN);
+      const upper = avg * (1 + CORRECTION_MARGIN);
+      if (userPrice < lower || userPrice > upper) {
+        return {ok:false, reason:`Must be within ${Math.round(CORRECTION_MARGIN*100)}% of trusted: [${lower.toFixed(2)}–${upper.toFixed(2)} Robux]`};
+      }
+    }
+    // Modifier strict rules
+    for (const m of modsArr) {
+      if (STRICT_MODIFIER_MIN[m] && userPrice < STRICT_MODIFIER_MIN[m]) {
+        return {ok:false, reason:`Modifier "${m}" requires at least ${STRICT_MODIFIER_MIN[m]} Robux`};
+      }
+    }
+    // Not absurdly low
+    if (userPrice < 0.08) return {ok:false, reason:"Price too low for any plant."};
+    return {ok:true, reason:"Accepted."};
+  }
+
+  // ------------------ UI/Event Logic ---------------------
   let currentCalc = null;
 
-  function calculate() {
-    const fruit = fruitSelect.value.toLowerCase();
-    const weight = parseFloat(weightInput.value);
-    const modifiers = Array.from(modifiersSelect.selectedOptions).map(o => o.value);
-
-    if (isNaN(weight) || weight <= 0) {
-      priceDiv.innerText = "❗ Please enter a valid weight.";
-      feedbackButtons.style.display = 'none';
-      correctionInput.style.display = 'none';
-      confidenceDiv.innerText = '';
-      breakdownDiv.innerHTML = '';
-      return;
-    }
-
-    const base = learnedPrices[fruit]?.base || basePrices[fruit] || 100;
-    const multiplier = getMultiplier(modifiers);
-    const estimatedPrice = Math.round(weight * base * multiplier);
-
-    priceDiv.innerText = `Estimated Price: ${estimatedPrice} cents (${(estimatedPrice / 100).toFixed(2)} Robux)`;
-    confidenceDiv.innerText = learnedPrices[fruit] ? `AI Confidence: ${learnedPrices[fruit].confidence} confirmation(s)` : 'AI Confidence: No data yet';
-    breakdownDiv.innerHTML = `
-      <strong>Breakdown:</strong><br>
-      Base: ${base.toFixed(2)}¢/kg<br>
-      Weight: ${weight}kg<br>
-      Modifiers: ${modifiers.join(", ") || "None"}<br>
-      Multiplier: ×${multiplier.toFixed(2)}<br>
-      Final: ${estimatedPrice}¢
-    `;
-
-    feedbackButtons.style.display = 'flex';
-    correctionInput.style.display = 'none';
-    correctPriceInput.value = '';
-    currentCalc = { fruit, weight, modifiers, estimatedPrice, base, multiplier };
+  function displayResult(res) {
+    document.getElementById("priceResult").textContent =
+      `Estimated Price: ${res.price} Robux`;
+    document.getElementById("breakdown").innerHTML =
+      `<b>Details:</b><br>
+      Base: ${res.breakdown.base} Robux/kg<br>
+      Weight: ${res.breakdown.weight}kg<br>
+      Modifiers: ${res.breakdown.mods.map(m=>MODIFIERS.find(x=>x.value===m)?.label).join(", ")||"None"}<br>
+      Multiplier: ${res.breakdown.multBreakdown.length?res.breakdown.multBreakdown.join(" × "):"N/A"}<br>
+      ${res.breakdown.strictInfo?'<span style="color:#cb902c">'+res.breakdown.strictInfo+'</span>':''}`;
   }
 
-  btnAccurate.onclick = async () => {
-    if (!currentCalc) return;
-    const { fruit, weight, estimatedPrice, base } = currentCalc;
-    if (!learnedPrices[fruit]) learnedPrices[fruit] = { base, confidence: 1 };
-    else learnedPrices[fruit].confidence++;
+  // --- Calculate button
+  document.getElementById("calculateBtn").onclick = function() {
+    const plantType = plantTypeSel.value;
+    const weight = parseFloat(document.getElementById("plantWeight").value);
+    const modsArr = Array.from(modifiersSel.selectedOptions).map(opt=>opt.value);
+    if (!plantType || isNaN(weight) || weight <= 0) {
+      document.getElementById("priceResult").innerText = "❗ Enter a valid weight and plant.";
+      document.getElementById("feedbackButtons").style.display='none';
+      document.getElementById("correctionInput").style.display='none';
+      document.getElementById("confidence").innerText = '';
+      document.getElementById("breakdown").innerText = '';
+      return;
+    }
+    const trusted = trustedData[plantType+"|"+modString(modsArr)] || trustedData[plantType] || null;
+    const res = calcPlantPrice(plantType, weight, modsArr, trusted);
+    currentCalc = { plantType, weight, modsArr, estimated:res.price };
+    displayResult(res);
 
-    const newBase = estimatedPrice / (weight * currentCalc.multiplier);
-    const oldConf = learnedPrices[fruit].confidence - 1;
-    learnedPrices[fruit].base = (learnedPrices[fruit].base * oldConf + newBase) / learnedPrices[fruit].confidence;
-
-    await collection.doc(fruit).set(learnedPrices[fruit]);
-    localStorage.setItem('learnedPrices', JSON.stringify(learnedPrices));
-    alert("Thanks! Price confidence updated.");
-    calculate();
+    // Show confidence (confirmation count if any)
+    let conf = trusted && trusted.confidence ? trusted.confidence : 0;
+    document.getElementById("confidence").innerHTML =
+      conf ? `<b>AI Confidence:</b> ${conf} confirmation${conf==1?'':'s'}` : 'AI Confidence: (no data yet)';
+    document.getElementById("feedbackButtons").style.display = 'flex';
+    document.getElementById("correctionInput").style.display = 'none';
+    document.getElementById("correctPrice").value = '';
   };
 
-  btnInaccurate.onclick = () => correctionInput.style.display = 'block';
-
-  submitCorrection.onclick = async () => {
+  // --- Feedback accurate
+  document.getElementById("btnAccurate").onclick = async function() {
     if (!currentCalc) return;
-    const corrected = parseInt(correctPriceInput.value);
-    if (isNaN(corrected) || corrected <= 0) return alert("Enter valid corrected price (cents).");
-
-    const { fruit, weight, multiplier } = currentCalc;
-    const correctedBase = corrected / (weight * multiplier);
-    learnedPrices[fruit] = { base: correctedBase, confidence: 1 };
-
-    await collection.doc(fruit).set(learnedPrices[fruit]);
-    localStorage.setItem('learnedPrices', JSON.stringify(learnedPrices));
-    alert("Thanks! Correction saved.");
-    correctionInput.style.display = 'none';
-    calculate();
+    const key = currentCalc.plantType + "|" + modString(currentCalc.modsArr);
+    // Add a confirmation to trusted data or create entry
+    if (!trustedData[key]) {
+      trustedData[key] = {
+        base: currentCalc.estimated/currentCalc.weight,
+        confidence: 1,
+        history: [currentCalc.estimated],
+        confirmed: [currentCalc.estimated]
+      };
+    } else {
+      let d = trustedData[key];
+      d.confidence = (d.confidence||0) + 1;
+      d.history = d.history || [];
+      d.confirmed = d.confirmed || [];
+      d.base = (d.base*(d.confidence-1) + (currentCalc.estimated/currentCalc.weight)) / d.confidence;
+      d.history.push(currentCalc.estimated);
+      d.confirmed.push(currentCalc.estimated);
+    }
+    // Persist
+    await PLANTS_COLLECTION.doc(key).set(trustedData[key]);
+    storeTrustedLocal();
+    alert("Thanks! Your confirmation has improved our AI.");
+    document.getElementById("calculateBtn").click();
   };
 
-  document.getElementById('calcBtn').addEventListener('click', calculate);
-  window.onload = () => { weightInput.value = 1; calculate(); };
-</script>
+  // --- Feedback inaccurate
+  document.getElementById("btnInaccurate").onclick = function() {
+    document.getElementById("correctionInput").style.display = 'block';
+    document.getElementById("correctionInput").scrollIntoView({behavior:'smooth'});
+  };
+
+  // --- Correction submission
+  document.getElementById("submitCorrection").onclick = async function() {
+    if (!currentCalc) return;
+    const correction = parseFloat(document.getElementById("correctPrice").value);
+    if (isNaN(correction) || correction<=0) return alert("Enter a valid price (Robux, numeric)");
+    const key = currentCalc.plantType + "|" + modString(currentCalc.modsArr);
+    const validation = validateCorrection(currentCalc.plantType, currentCalc.weight, currentCalc.modsArr, correction, trustedData[key]||trustedData[currentCalc.plantType]||null);
+    if (!validation.ok) return alert("Correction rejected: "+validation.reason);
+    // Send to admin queue, not overwrite trusted immediately
+    await CORRECTION_QUEUE.add({
+      plantType: currentCalc.plantType,
+      weight: currentCalc.weight,
+      mods: currentCalc.modsArr,
+      price: correction,
+      submitted: (new Date).toISOString()
+    });
+    alert("Correction submitted for admin review. Thanks for helping improve the AI!");
+    document.getElementById("correctionInput").style.display = 'none';
+  };
+
+  // ------------------- Admin Panel Security & Logic --------------------
+  function showAdminLogin(show) {
+    document.getElementById("adminLogin").style.display = show?'flex':'none';
+    document.getElementById("adminPassword").value = '';
+    document.getElementById("adminLoginMsg").innerText = '';
+  }
+
+  document.getElementById("adminButton").onclick = () => {
+    if (adminLoggedIn) {
+      displayAdminPanel();
+    } else {
+      showAdminLogin(true);
+    }
+  };
+  document.getElementById("closeAdmin").onclick = () => {
+    document.getElementById("adminModal").style.display = 'none';
+  };
+  document.getElementById("adminLoginBtn").onclick = ()=>{
+    const pw = document.getElementById("adminPassword").value;
+    if (pw===ADMIN_PASS) {
+      adminLoggedIn = true;
+      showAdminLogin(false);
+      displayAdminPanel();
+    } else {
+      document.getElementById("adminLoginMsg").innerText = "Incorrect password.";
+    }
+  };
+  // Keyboard: Enter for admin login
+  document.getElementById("adminPassword").addEventListener("keydown", function(e){
+    if (e.key==="Enter") document.getElementById("adminLoginBtn").click();
+  });
+
+  async function displayAdminPanel() {
+    // Load latest
+    await loadTrustedData();
+    storeTrustedLocal();
+    // List trusted
+    const adminList = document.getElementById("adminList");
+    adminList.innerHTML = "";
+    let filterText = document.getElementById("adminFilter").value?.toLowerCase()||"";
+    Object.entries(trustedData)
+      .filter(([key,data]) =>
+        !filterText ||
+        key.toLowerCase().includes(filterText) ||
+        (data.mods && data.mods.join(",").includes(filterText)) )
+      .sort((a,b)=> a[0].localeCompare(b[0]))
+      .forEach(([key,data])=>{
+        const e = document.createElement("div");
+        e.className = "admin-row";
+        e.innerHTML =
+          `<span><b>${key}</b>
+            <span class="success">AvgBase: ${data.base ? Math.round(data.base*100)/100 : "-"}</span>
+            <span>Conf:${data.confidence || "0"} | Entries:${data.history?.length||"0"}</span>
+          </span>
+          <span class="admin-actions">
+            <button onclick='overrideBase("${key}")'>Override</button>
+            <button onclick='deleteTrusted("${key}")'>Delete</button>
+          </span>`;
+        adminList.appendChild(e);
+      });
+    // Trending chart
+    renderTrendChart();
+    // Correction queue
+    const queueElem = document.getElementById("correctionQueue");
+    queueElem.innerHTML = "";
+    correctionQueue.forEach(corr=>{
+      const li = document.createElement("li");
+      li.innerHTML = `<b>${corr.plantType}|${modString(corr.mods||[])}</b> (Weight ${corr.weight}kg): <span class="danger">${corr.price} Robux</span> <button onclick='approveCorrection("${corr.id}")'>Approve</button> <button onclick='rejectCorrection("${corr.id}")'>Reject</button>`;
+      queueElem.appendChild(li);
+    });
+    // Modal up
+    document.getElementById("adminModal").style.display = 'flex';
+  }
+  document.getElementById("adminFilter").oninput = displayAdminPanel;
+  // --- Global for admin actions (for inline onclick) ---
+  window.overrideBase = async function(key) {
+    const val = prompt("Override base value (Robux/kg for this plant+mods)?");
+    if (val && !isNaN(parseFloat(val))) {
+      trustedData[key].base = parseFloat(val);
+      await PLANTS_COLLECTION.doc(key).set(trustedData[key]);
+      storeTrustedLocal();
+      alert("Base value overridden.");
+      displayAdminPanel();
+    }
+  };
+  window.deleteTrusted = async function(key) {
+    if (!confirm("Delete trusted entry?")) return;
+    await PLANTS_COLLECTION.doc(key).delete();
+    delete trustedData[key];
+    storeTrustedLocal();
+    displayAdminPanel();
+  };
+  window.approveCorrection = async function(id) {
+    // Find, promote to trusted, and delete from queue
+    const corr = correctionQueue.find(x=>x.id===id);
+    if (corr) {
+      const key = corr.plantType + "|" + modString(corr.mods);
+      trustedData[key] = {
+        base: corr.price/corr.weight,
+        confidence: 1,
+        history: [corr.price],
+        confirmed: [corr.price]
+      };
+      await PLANTS_COLLECTION.doc(key).set(trustedData[key]);
+      await CORRECTION_QUEUE.doc(id).delete();
+      alert("Correction approved and promoted to trusted.");
+      displayAdminPanel();
+    }
+  };
+  window.rejectCorrection = async function(id) {
+    if (!confirm("Reject this correction?")) return;
+    await CORRECTION_QUEUE.doc(id).delete();
+    alert("Correction rejected and removed from queue.");
+    displayAdminPanel();
+  };
+
+  // -- Trend chart (Chart.js)
+  let trendChartInstance = null;
+  function renderTrendChart() {
+    const ctx = document.getElementById("trendChart").getContext("2d");
+    // Collect all price histories
+    let labels = [], values = [];
+    Object.entries(trustedData).forEach(([key, data])=>{
+      if (data && data.history && data.history.length>0) {
+        labels.push(key);
+        values.push(data.history[data.history.length-1]);
+      }
+    });
+    if (trendChartInstance) trendChartInstance.destroy();
+    trendChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels, datasets: [{ label: "Latest Trusted Prices", backgroundColor:'#34c274', data: values }]
+      },
+      options: { plugins:{legend:{display:!1}}, scales:{x:{ticks:{autoSkip:false}}} }
+    });
+  }
+
+  // Initial load and calculation
+  (async function(){
+    await loadTrustedData();
+    document.getElementById("calculateBtn").click();
+  })();
+
+  // Full plant list in dropdown is always alphabetical for user
+  </script>
 </body>
 </html>
