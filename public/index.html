@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🌱 GrowAGarden Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GrowAGarden Calculator</title>
   <style>
     body {
       background: #e6f9ee;
@@ -13,28 +13,24 @@
       align-items: center;
       padding: 2em;
     }
-
     h1 {
       color: #248f50;
       font-size: 2rem;
     }
-
     .calculator {
       background: white;
       padding: 1.5em;
       border-radius: 1em;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      max-width: 450px;
+      max-width: 400px;
       width: 100%;
     }
-
     label {
       display: block;
       margin: 0.75em 0 0.25em;
       font-weight: bold;
     }
-
-    input, select, button {
+    select, input, button {
       width: 100%;
       padding: 0.6em;
       margin-bottom: 1em;
@@ -42,7 +38,6 @@
       border-radius: 0.4em;
       font-size: 1em;
     }
-
     button {
       background-color: #31a76d;
       color: white;
@@ -50,168 +45,163 @@
       cursor: pointer;
       transition: background 0.2s ease;
     }
-
     button:hover {
       background-color: #278e5a;
     }
-
     .result {
       font-size: 1.3em;
       font-weight: bold;
       color: #333;
       margin-top: 1em;
+      min-height: 1.5em;
     }
   </style>
 </head>
 <body>
   <h1>🌱 GrowAGarden Calculator</h1>
   <div class="calculator">
-    <label for="fruit">🌿 Plant Type</label>
-    <select id="fruit">
-      <option>Apple</option>
-      <option>Banana</option>
-      <option>Beanstalk</option>
-      <option>Blueberry</option>
-      <option>Bamboo</option>
-      <option>Cacao</option>
-      <option>Cactus</option>
-      <option>Carrot</option>
-      <option>Celestlberry</option>
-      <option>Coconut</option>
-      <option>Corn</option>
-      <option>Cranberry</option>
-      <option>Daffodil</option>
-      <option>Dragonfruit</option>
-      <option>Durian</option>
-      <option>Eggplant</option>
-      <option>Grape</option>
-      <option>Mango</option>
-      <option>Moonflower</option>
-      <option>Mushroom</option>
-      <option>OrangeTulip</option>
-      <option>Papaya</option>
-      <option>Passionfruit</option>
-      <option>Peach</option>
-      <option>Pear</option>
-      <option>Pepper</option>
-      <option>Pumpkin</option>
-      <option>Raspberry</option>
-      <option>Soulfruit</option>
-      <option>Strawberry</option>
-      <option>Tomato</option>
-      <option>Watermelon</option>
+    <label for="plant">Plant Type</label>
+    <select id="plant" multiple size="6" style="height:auto;">
+      <option value="apple">Apple</option>
+      <option value="banana">Banana</option>
+      <option value="bamboo">Bamboo</option>
+      <option value="beanstalk">Beanstalk</option>
+      <option value="cactus">Cactus</option>
+      <option value="cacao">Cacao</option>
+      <option value="carrot">Carrot</option>
+      <option value="coconut">Coconut</option>
+      <option value="corn">Corn</option>
+      <option value="cranberry">Cranberry</option>
+      <option value="daffodil">Daffodil</option>
+      <option value="dragonfruit">Dragonfruit</option>
+      <option value="durian">Durian</option>
+      <option value="eggplant">Eggplant</option>
+      <option value="glowshroom">Glowshroom</option>
+      <option value="grape">Grape</option>
+      <option value="mango">Mango</option>
+      <option value="moonflower">Moonflower</option>
+      <option value="mushroom">Mushroom</option>
+      <option value="orangetulip">Orangetulip</option>
+      <option value="papaya">Papaya</option>
+      <option value="passionfruit">Passionfruit</option>
+      <option value="pepper">Pepper</option>
+      <option value="pear">Pear</option>
+      <option value="peach">Peach</option>
+      <option value="pumpkin">Pumpkin</option>
+      <option value="raspberry">Raspberry</option>
+      <option value="soulfruit">Soulfruit</option>
+      <option value="strawberry">Strawberry</option>
+      <option value="tomato">Tomato</option>
+      <option value="watermelon">Watermelon</option>
     </select>
 
-    <label for="weight">⚖️ Weight (kg)</label>
-    <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42">
+    <label for="weight">Weight (kg)</label>
+    <input type="number" id="weight" step="0.01" placeholder="e.g. 0.42" />
 
-    <label for="modifiers">✨ Modifiers (Hold Ctrl or ⌘ to select multiple)</label>
-    <select id="modifiers" multiple>
-      <option>🌈 Rainbow</option>
-      <option>🥇 Gold</option>
-      <option>⚡ Shocked</option>
-      <option>❄️ Frozen</option>
-      <option>💧 Wet</option>
-      <option>🥶 Chilled</option>
-      <option>🍫 Choc</option>
-      <option>🌙 Moonlit</option>
-      <option>🩸 Bloodlit</option>
-      <option>🌟 Celestial</option>
-      <option>🎉 Disco</option>
-      <option>🧟 Zomb</option>
-      <option>🔋 Plasma</option>
+    <label for="modifiers">Modifiers (hold Ctrl/Cmd to select multiple)</label>
+    <select id="modifiers" multiple size="6" style="height:auto;">
+      <option value="rainbow">🌈 Rainbow</option>
+      <option value="gold">👑 Gold</option>
+      <option value="shocked">⚡ Shocked</option>
+      <option value="frozen">❄️ Frozen</option>
+      <option value="wet">💧 Wet</option>
+      <option value="chilled">🧊 Chilled</option>
+      <option value="choc">🍫 Choc</option>
+      <option value="moonlit">🌙 Moonlit</option>
+      <option value="bloodlit">🩸 Bloodlit</option>
+      <option value="celestial">✨ Celestial</option>
+      <option value="disco">🎉 Disco</option>
+      <option value="zombplasma">🧟 Zomb Plasma</option>
     </select>
 
     <button onclick="calculate()">💰 Calculate</button>
     <div class="result" id="price">Estimated Price: —</div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
-      authDomain: "growagardenplantcostcalculator.firebaseapp.com",
-      databaseURL: "https://growagardenplantcostcalculator-default-rtdb.firebaseio.com",
-      projectId: "growagardenplantcostcalculator",
-      storageBucket: "growagardenplantcostcalculator.appspot.com",
-      messagingSenderId: "410113480248",
-      appId: "1:410113480248:web:72badb81206b458ecd38cd",
-      measurementId: "G-K7XD9NMRGZ"
-    };
+    // Your sample data entries as an array of objects
+    // Each record: { modifiers: sorted string array, plant: string, weight: number, price: dollars number }
+    const priceData = [
+      {modifiers: ["frozen"], plant:"strawberry", weight:0.25, price:135},
+      {modifiers: ["moonlit","wet"], plant:"dragonfruit", weight:1, price:12861}, // weight unknown, guess 1kg (adjusted)
+      {modifiers: ["wet"], plant:"strawberry", weight:0.26, price:27},
+      {modifiers: [], plant:"strawberry", weight:0.23, price:14},
+      {modifiers: ["wet"], plant:"dragonfruit", weight:12.56, price:10414},
+      {modifiers: [], plant:"celestlberry", weight:2.13, price:9040},
+      {modifiers: ["wet"], plant:"celestlberry", weight:2.30, price:21123},
+      {modifiers: ["shocked"], plant:"coconut", weight:18.72, price:71503},
+      {modifiers: ["shocked","wet"], plant:"coconut", weight:15.88, price:51953},
+      {modifiers: ["gold","wet"], plant:"coconut", weight:18.83, price:28944},
+      {modifiers: [], plant:"durian", weight:46.20, price:166789},
+      {modifiers: ["disco","wet"], plant:"cranberry", weight:1.24, price:384357},
+      {modifiers: ["wet"], plant:"glowshroom", weight:0.73, price:574},
+      {modifiers: ["wet"], plant:"moonflower", weight:2.11, price:21147},
+      {modifiers: ["frozen","shocked"], plant:"mushroom", weight:1, price:14854248},
+      {modifiers: ["wet"], plant:"beanstalk", weight:12.86, price:66152},
+      {modifiers: ["wet"], plant:"mango", weight:17.5, price:17705},
+      {modifiers: ["wet"], plant:"blueberry", weight:0.22, price:49},
+      {modifiers: ["gold","wet"], plant:"blueberry", weight:0.27, price:1471},
+      {modifiers: ["bloodlit","wet"], plant:"banana", weight:1.95, price:20374},
+      {modifiers: ["blood"], plant:"banana", weight:2.09, price:11676},
+      {modifiers: ["wet"], plant:"corn", weight:2.49, price:124},
+      {modifiers: ["wet"], plant:"apple", weight:3.36, price:691},
+      {modifiers: ["wet"], plant:"tomato", weight:0.67, price:109},
+      {modifiers: ["bloodlit","wet","durian"], plant:"durian", weight:8.48, price:28090},
+      {modifiers: ["celestial","wet","durian"], plant:"durian", weight:8.81, price:733382},
+      {modifiers: [], plant:"tomato", weight:0.68, price:56},
+      {modifiers: ["choc","shocked","wet"], plant:"mushroom", weight:1, price:13900305},
+    ];
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    // Sort modifiers in data entries for easy matching
+    priceData.forEach(d => d.modifiers.sort());
 
-    const baseModifierWeights = {
-      "🌈 Rainbow": 3.2,
-      "🥇 Gold": 2.3,
-      "⚡ Shocked": 5.5,
-      "❄️ Frozen": 4.5,
-      "💧 Wet": 1.6,
-      "🥶 Chilled": 1.9,
-      "🍫 Choc": 3.0,
-      "🌙 Moonlit": 2.5,
-      "🩸 Bloodlit": 2.2,
-      "🌟 Celestial": 3.6,
-      "🎉 Disco": 4.8,
-      "🧟 Zomb": 2.9,
-      "🔋 Plasma": 3.3
-    };
-
-    async function calculate() {
-      const fruit = document.getElementById("fruit").value.toLowerCase();
+    function calculate() {
+      const plantSelect = document.getElementById("plant");
+      const selectedPlant = plantSelect.value.toLowerCase();
       const weight = parseFloat(document.getElementById("weight").value);
-      const selected = Array.from(document.getElementById("modifiers").selectedOptions).map(opt => opt.value);
-      const stripped = selected.map(label => label.replace(/^[^ ]+ /, ''));
+      const modifiersSelect = document.getElementById("modifiers");
+      const selectedModifiers = [...modifiersSelect.selectedOptions].map(o => o.value).sort();
 
+      if (!selectedPlant) {
+        document.getElementById("price").innerText = "❗ Please select a plant.";
+        return;
+      }
       if (isNaN(weight) || weight <= 0) {
         document.getElementById("price").innerText = "❗ Please enter a valid weight.";
         return;
       }
 
-      try {
-        const snap = await db.ref("learnedData").once("value");
-        const data = snap.val();
-        const matches = [];
+      // Find best matching record by plant and modifiers subset and closest weight
+      let bestMatch = null;
+      let smallestWeightDiff = Infinity;
 
-        for (const key in data) {
-          const entry = data[key];
-          if (!entry || entry.weight <= 0) continue;
+      for (const record of priceData) {
+        // Must be same plant
+        if (record.plant !== selectedPlant) continue;
 
-          const weightDiff = Math.abs(entry.weight - weight);
-          if (entry.fruit === fruit && weightDiff <= 1.5) {
-            let score = 1;
-            for (const mod of stripped) {
-              if (entry.modifiers.includes(mod)) score += 1.2;
-              else score -= 0.4;
-            }
-            matches.push({
-              pricePerKg: entry.price / entry.weight,
-              score
-            });
-          }
+        // All record modifiers must be in selectedModifiers (allow missing modifiers in selection)
+        if (!record.modifiers.every(m => selectedModifiers.includes(m))) continue;
+
+        // Calculate weight difference
+        let diff = Math.abs(record.weight - weight);
+        if (diff < smallestWeightDiff) {
+          smallestWeightDiff = diff;
+          bestMatch = record;
         }
-
-        let basePricePerKg = 100;
-        if (matches.length > 0) {
-          matches.sort((a, b) => b.score - a.score);
-          basePricePerKg = matches[0].pricePerKg;
-        }
-
-        let multiplier = 1.0;
-        for (const mod of selected) {
-          if (baseModifierWeights[mod]) multiplier *= baseModifierWeights[mod];
-        }
-
-        const finalPrice = Math.round(weight * basePricePerKg * multiplier);
-        document.getElementById("price").innerText =
-          `Estimated Price: ${finalPrice} coins 💰 (${(finalPrice / 100).toFixed(2)} Robux)`;
-
-      } catch (err) {
-        document.getElementById("price").innerText = "❗ Error calculating price.";
-        console.error(err);
       }
+
+      if (!bestMatch) {
+        document.getElementById("price").innerText = "No price data available for this combination.";
+        return;
+      }
+
+      // Price scale by weight ratio (linear scaling)
+      let estimatedPrice = (weight / bestMatch.weight) * bestMatch.price;
+
+      // Round and format
+      estimatedPrice = Math.round(estimatedPrice);
+
+      document.getElementById("price").innerText = `Estimated Price: $${estimatedPrice.toLocaleString()}`;
     }
   </script>
 </body>
