@@ -120,3 +120,5 @@ async function loadTrends() {
     }
   });
 }
+
+export default App;
