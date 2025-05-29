@@ -1,222 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GrowAGarden Plant Cost Calculator</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    max-width: 450px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background: #f0f9f9;
-    border-radius: 10px;
-    box-shadow: 0 0 8px #ccc;
-  }
-  h2 {
-    text-align: center;
-    margin-bottom: 1rem;
-    color: #317873;
-  }
-  label {
-    font-weight: bold;
-    margin-top: 1rem;
-  }
-  select, input, button {
-    width: 100%;
-    padding: 8px;
-    font-size: 1rem;
-    margin-top: 0.25rem;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
-  select[multiple] {
-    height: 140px;
-  }
-  button {
-    background-color: #317873;
-    color: white;
-    border: none;
-    cursor: pointer;
-    margin-top: 1.5rem;
-    transition: background-color 0.3s ease;
-  }
-  button:hover {
-    background-color: #245e5b;
-  }
-  #price-output {
-    font-size: 1.5rem;
-    color: #317873;
-    margin-top: 1rem;
-    text-align: center;
-  }
-  #error-msg {
-    color: red;
-    margin-top: 1rem;
-    font-weight: bold;
-    text-align: center;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>GrowAGarden Plant Cost Calculator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f0f8f0;
+    }
+    select, input, button {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    #result {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    #correction-section {
+      margin-top: 2rem;
+      border-top: 1px solid #ccc;
+      padding-top: 1rem;
+    }
+    .msg {
+      margin-top: 0.5rem;
+    }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
-<h2>GrowAGarden Plant Cost Calculator</h2>
+  <h1>GrowAGarden Plant Cost Calculator</h1>
 
-<label for="plant-select">Select Plant:</label>
-<select id="plant-select">
-  <option value="" disabled selected>-- Choose a plant --</option>
-</select>
+  <label>Plant:
+    <select id="plant">
+      <option value="Carrot">Carrot</option>
+      <option value="Rose">Rose</option>
+      <option value="Sunflower">Sunflower</option>
+    </select>
+  </label><br>
 
-<label for="modifier-select">Select Modifiers (Ctrl/Cmd+Click to select multiple):</label>
-<select id="modifier-select" multiple></select>
+  <label>Weight (kg):
+    <input type="number" id="weight" step="0.01" />
+  </label><br>
 
-<label for="weight-input">Enter Weight (kg):</label>
-<input type="number" id="weight-input" step="0.01" min="0.01" placeholder="e.g. 1.25" />
+  <label>Modifiers:
+    <select id="modifier" multiple>
+      <option value="Organic">Organic</option>
+      <option value="Imported">Imported</option>
+      <option value="Seasonal">Seasonal</option>
+    </select>
+  </label><br>
 
-<button id="calc-btn">Calculate Price</button>
+  <button onclick="calculate()">Calculate Price</button>
+  <div id="result"></div>
 
-<div id="price-output">Price: -</div>
-<div id="error-msg"></div>
+  <div id="correction-section">
+    <h3>Suggest a Correction</h3>
+    <label>Correct Price ($):
+      <input type="number" id="correctPrice" step="0.01" />
+    </label><br>
+    <button onclick="submitCorrection()">Submit Correction</button>
+    <div class="msg" id="correctionMsg"></div>
+  </div>
 
-<script>
-  // Starting data (your initial price examples)
-  const startingData = [
-    { modifiers: ['frozen'], plant: 'strawberry', weight: 0.25, price: 135 },
-    { modifiers: ['moonlit'], plant: 'dragonfruit', weight: 1, price: 12861 },
-    { modifiers: ['wet'], plant: 'strawberry', weight: 0.26, price: 27 },
-    { modifiers: [], plant: 'strawberry', weight: 0.23, price: 14 },
-    { modifiers: ['wet'], plant: 'dragonfruit', weight: 12.56, price: 10414 },
-    { modifiers: [], plant: 'celestlberry', weight: 2.13, price: 9040 },
-    { modifiers: ['wet'], plant: 'celestlberry', weight: 2.30, price: 21123 },
-    { modifiers: ['shocked'], plant: 'coconut', weight: 18.72, price: 71503 },
-    { modifiers: ['wet', 'shocked'], plant: 'coconut', weight: 15.88, price: 51953 },
-    { modifiers: ['wet', 'gold'], plant: 'coconut', weight: 18.83, price: 28944 },
-    { modifiers: [], plant: 'durian', weight: 46.20, price: 166789 },
-    { modifiers: ['disco', 'wet'], plant: 'cranberry', weight: 1.24, price: 384357 },
-    { modifiers: ['wet'], plant: 'glowshroom', weight: 0.73, price: 574 },
-    { modifiers: ['wet'], plant: 'moonflower', weight: 2.11, price: 21147 },
-    { modifiers: ['frozen', 'shocked'], plant: 'mushroom', weight: 1, price: 14854248 },
-    { modifiers: ['wet'], plant: 'beanstalk', weight: 12.86, price: 66152 },
-    { modifiers: ['wet'], plant: 'mango', weight: 17.50, price: 17705 },
-    { modifiers: ['wet'], plant: 'blueberry', weight: 0.22, price: 49 },
-    { modifiers: ['wet', 'gold'], plant: 'blueberry', weight: 0.27, price: 1471 },
-    { modifiers: ['wet'], plant: 'blood banana', weight: 1.95, price: 20374 },
-    { modifiers: [], plant: 'blood banana', weight: 2.09, price: 11676 },
-    { modifiers: ['wet'], plant: 'corn', weight: 2.49, price: 124 },
-    { modifiers: ['wet'], plant: 'apple', weight: 3.36, price: 691 },
-    { modifiers: ['wet'], plant: 'tomato', weight: 0.67, price: 109 },
-    { modifiers: ['bloodlit', 'wet'], plant: 'durian', weight: 8.48, price: 28090 },
-    { modifiers: ['celestial', 'wet'], plant: 'durian', weight: 8.81, price: 733382 },
-    { modifiers: [], plant: 'tomato', weight: 0.68, price: 56 },
-    { modifiers: ['choc', 'wet', 'shocked'], plant: 'mushroom', weight: 1, price: 13900305 },
-  ];
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
+      authDomain: "growagardenplantcostcalculator.firebaseapp.com",
+      databaseURL: "https://growagardenplantcostcalculator-default-rtdb.firebaseio.com",
+      projectId: "growagardenplantcostcalculator",
+      storageBucket: "growagardenplantcostcalculator.appspot.com",
+      messagingSenderId: "410113480248",
+      appId: "1:410113480248:web:72badb81206b458ecd38cd",
+      measurementId: "G-K7XD9NMRGZ"
+    };
 
-  // Lists from your data
-  const modifiersList = [
-    "rainbow", "gold", "shocked", "frozen", "wet", "chilled", "choc",
-    "moonlit", "bloodlit", "celestial", "disco", "zomb", "plasma"
-  ];
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-  const plantsList = [
-    "Apple", "Bamboo", "Banana", "Beanstalk", "Blueberry", "Cactus", "Cacao",
-    "Carrot", "Celestlberry", "Coconut", "Corn", "Cranberry", "Daffodil",
-    "Dragonfruit", "Durian", "Eggplant", "Grape", "Glowshroom", "Mango",
-    "Moonflower", "Mushroom", "Orangetulip", "Papaya", "Passionfruit", "Peach",
-    "Pear", "Pepper", "Pumpkin", "Raspberry", "Soulfruit", "Strawberry", "Tomato",
-    "Watermelon"
-  ];
+    // Trusted starting data
+    const startingData = [
+      { plant: 'Carrot', modifiers: ['Organic'], weight: 1, price: 3 },
+      { plant: 'Rose', modifiers: ['Imported'], weight: 0.5, price: 5 },
+      { plant: 'Sunflower', modifiers: [], weight: 2, price: 4 },
+    ];
 
-  // Utility function to check arrays equality (order matters)
-  function arraysEqual(a, b) {
-    if (a.length !== b.length) return false;
-    for(let i = 0; i < a.length; i++) if(a[i] !== b[i]) return false;
-    return true;
-  }
+    function normalizeModifiers(mods) {
+      return mods.sort().join(',');
+    }
 
-  // Calculate price function
-  function calculatePrice(selectedPlant, selectedModifiers, inputWeight) {
-    const plant = selectedPlant.toLowerCase();
-    const modifiers = selectedModifiers.map(m => m.toLowerCase()).sort();
+    function calculate() {
+      const plant = document.getElementById('plant').value;
+      const weight = parseFloat(document.getElementById('weight').value);
+      const modifierEls = Array.from(document.getElementById('modifier').selectedOptions);
+      const modifiers = modifierEls.map(opt => opt.value);
 
-    // Try exact match first (modifiers, plant, and weight close)
-    for (const entry of startingData) {
-      if (
-        entry.plant.toLowerCase() === plant &&
-        arraysEqual(entry.modifiers.slice().sort(), modifiers) &&
-        Math.abs(entry.weight - inputWeight) < 0.001
-      ) {
-        return entry.price;
+      if (isNaN(weight) || weight <= 0) {
+        document.getElementById('result').textContent = 'Enter a valid weight.';
+        return;
+      }
+
+      const match = startingData.find(entry =>
+        entry.plant === plant &&
+        normalizeModifiers(entry.modifiers) === normalizeModifiers(modifiers)
+      );
+
+      if (match) {
+        const price = (match.price / match.weight) * weight;
+        document.getElementById('result').textContent = `Estimated Price: $${price.toFixed(2)}`;
+      } else {
+        document.getElementById('result').textContent = 'No matching data. Please consider submitting a correction.';
       }
     }
 
-    // No exact match, find all entries for plant+modifiers and interpolate by price per kg
-    const filtered = startingData.filter(entry =>
-      entry.plant.toLowerCase() === plant &&
-      arraysEqual(entry.modifiers.slice().sort(), modifiers)
-    );
+    function submitCorrection() {
+      const plant = document.getElementById('plant').value;
+      const weight = parseFloat(document.getElementById('weight').value);
+      const modifierEls = Array.from(document.getElementById('modifier').selectedOptions);
+      const modifiers = modifierEls.map(opt => opt.value);
+      const correctPrice = parseFloat(document.getElementById('correctPrice').value);
+      const correctionMsg = document.getElementById('correctionMsg');
 
-    if (filtered.length === 0) {
-      return null; // no data for combo
+      if (isNaN(weight) || weight <= 0 || isNaN(correctPrice) || correctPrice <= 0) {
+        correctionMsg.textContent = 'Please enter valid weight and price.';
+        correctionMsg.style.color = 'red';
+        return;
+      }
+
+      const perKg = correctPrice / weight;
+
+      // Check if it's consistent (within 25%) of existing entries for same plant/modifier
+      const matches = startingData.filter(entry =>
+        entry.plant === plant &&
+        normalizeModifiers(entry.modifiers) === normalizeModifiers(modifiers)
+      );
+
+      let valid = false;
+      if (matches.length === 0) {
+        valid = true; // accept new combination
+      } else {
+        valid = matches.some(entry => {
+          const entryPerKg = entry.price / entry.weight;
+          const lower = entryPerKg * 0.75;
+          const upper = entryPerKg * 1.25;
+          return perKg >= lower && perKg <= upper;
+        });
+      }
+
+      if (valid) {
+        const newEntry = { plant, modifiers, weight, price: correctPrice };
+        startingData.push(newEntry);
+        db.ref("corrections").push(newEntry);
+        correctionMsg.textContent = 'Thank you! Correction accepted and added.';
+        correctionMsg.style.color = 'green';
+      } else {
+        correctionMsg.textContent = 'Correction rejected: seems inconsistent with trusted data.';
+        correctionMsg.style.color = 'red';
+      }
     }
-
-    // Find closest weight entry to inputWeight
-    filtered.sort((a,b) => Math.abs(a.weight - inputWeight) - Math.abs(b.weight - inputWeight));
-    const closest = filtered[0];
-
-    // Price per kg * inputWeight
-    const pricePerKg = closest.price / closest.weight;
-    return +(pricePerKg * inputWeight).toFixed(2);
-  }
-
-  // Populate plant select dropdown
-  const plantSelect = document.getElementById('plant-select');
-  plantsList.forEach(plant => {
-    const option = document.createElement('option');
-    option.value = plant.toLowerCase();
-    option.textContent = plant;
-    plantSelect.appendChild(option);
-  });
-
-  // Populate modifiers multi-select
-  const modifierSelect = document.getElementById('modifier-select');
-  modifiersList.forEach(mod => {
-    const option = document.createElement('option');
-    option.value = mod.toLowerCase();
-    option.textContent = mod.charAt(0).toUpperCase() + mod.slice(1);
-    modifierSelect.appendChild(option);
-  });
-
-  // Calculate button click handler
-  document.getElementById('calc-btn').addEventListener('click', () => {
-    const selectedPlant = plantSelect.value;
-    const selectedModifiers = Array.from(modifierSelect.selectedOptions).map(o => o.value);
-    const weightInput = parseFloat(document.getElementById('weight-input').value);
-    const priceOutput = document.getElementById('price-output');
-    const errorMsg = document.getElementById('error-msg');
-
-    errorMsg.textContent = '';
-    priceOutput.textContent = 'Price: -';
-
-    if (!selectedPlant) {
-      errorMsg.textContent = 'Please select a plant.';
-      return;
-    }
-    if (!weightInput || weightInput <= 0) {
-      errorMsg.textContent = 'Please enter a valid positive weight.';
-      return;
-    }
-
-    const price = calculatePrice(selectedPlant, selectedModifiers, weightInput);
-    if (price === null) {
-      errorMsg.textContent = 'No pricing data available for this plant and modifiers combination.';
-      return;
-    }
-
-    priceOutput.textContent = `Price: $${price.toLocaleString()}`;
-  });
-</script>
-
+  </script>
 </body>
 </html>
