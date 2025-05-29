@@ -2,166 +2,156 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GrowAGarden Plant Cost Calculator</title>
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 2rem;
-      background: #f0f8f0;
-    }
-    select, input, button {
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      font-size: 1rem;
-    }
-    #result {
-      margin-top: 1rem;
-      font-weight: bold;
-    }
-    #correction-section {
-      margin-top: 2rem;
-      border-top: 1px solid #ccc;
-      padding-top: 1rem;
-    }
-    .msg {
-      margin-top: 0.5rem;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; background: #f0f8f0; }
+    h1 { text-align: center; }
+    label, select, input, button { display: block; margin: 10px 0; width: 100%; }
+    .modifiers label { display: inline-block; margin: 5px; }
+    #result { font-weight: bold; margin-top: 20px; font-size: 1.3em; }
+    #adminPanel { margin-top: 40px; padding: 10px; border: 1px solid #ccc; background: #fff5f5; display: none; }
   </style>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
-
   <h1>GrowAGarden Plant Cost Calculator</h1>
+  <label for="plant">Select Plant:</label>
+  <select id="plant"></select>
 
-  <label>Plant:
-    <select id="plant">
-      <option value="Carrot">Carrot</option>
-      <option value="Rose">Rose</option>
-      <option value="Sunflower">Sunflower</option>
-    </select>
-  </label><br>
+  <div class="modifiers" id="modifiers"></div>
 
-  <label>Weight (kg):
-    <input type="number" id="weight" step="0.01" />
-  </label><br>
+  <label for="weight">Enter Weight (kg):</label>
+  <input type="number" step="0.01" id="weight">
 
-  <label>Modifiers:
-    <select id="modifier" multiple>
-      <option value="Organic">Organic</option>
-      <option value="Imported">Imported</option>
-      <option value="Seasonal">Seasonal</option>
-    </select>
-  </label><br>
-
-  <button onclick="calculate()">Calculate Price</button>
+  <button onclick="calculatePrice()">Calculate Price</button>
   <div id="result"></div>
 
-  <div id="correction-section">
-    <h3>Suggest a Correction</h3>
-    <label>Correct Price ($):
-      <input type="number" id="correctPrice" step="0.01" />
-    </label><br>
-    <button onclick="submitCorrection()">Submit Correction</button>
-    <div class="msg" id="correctionMsg"></div>
+  <div id="adminPanel">
+    <h3>Admin Panel</h3>
+    <button onclick="toggleAdminPending()">Toggle Pending Entries</button>
+    <ul id="pendingList"></ul>
   </div>
 
   <script>
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
       authDomain: "growagardenplantcostcalculator.firebaseapp.com",
       databaseURL: "https://growagardenplantcostcalculator-default-rtdb.firebaseio.com",
       projectId: "growagardenplantcostcalculator",
-      storageBucket: "growagardenplantcostcalculator.appspot.com",
+      storageBucket: "growagardenplantcostcalculator.firebasestorage.app",
       messagingSenderId: "410113480248",
       appId: "1:410113480248:web:72badb81206b458ecd38cd",
       measurementId: "G-K7XD9NMRGZ"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Trusted starting data
-    const startingData = [
-      { plant: 'Carrot', modifiers: ['Organic'], weight: 1, price: 3 },
-      { plant: 'Rose', modifiers: ['Imported'], weight: 0.5, price: 5 },
-      { plant: 'Sunflower', modifiers: [], weight: 2, price: 4 },
-    ];
+    const plants = ["Carrot","Strawberry","Blueberry","Orangetulip","Tomato","Corn","Daffodil","Watermelon","Pumpkin","Apple","Bamboo","Coconut","Cactus","Dragonfruit","Mango","Grape","Mushroom","Pepper","Cacao","Beanstalk","Raspberry","Pear","Peach","Cranberry","Durian","Eggplant","Papaya","Banana","Passionfruit","Soulfruit"];
+    const modifiers = ["Rainbow","Gold","Shocked","Frozen","Wet","Chilled","Choc","Moonlit","Bloodlit","Celestial","Disco","Zomb","Plasma"];
+    const knownData = new Map([
+      ["frozen+strawberry+0.25", 135],
+      ["moonlit+wet+dragonfruit+12.861", 12861],
+      ["wet+strawberry+0.26", 27],
+      ["strawberry+0.23", 14],
+      ["wet+dragonfruit+12.56", 10414],
+      ["celestial+blueberry+2.13", 9040],
+      ["wet+celestial+blueberry+2.30", 21123],
+      ["shocked+coconut+18.72", 71503],
+      ["wet+shocked+coconut+15.88", 51953],
+      ["wet+gold+coconut+18.83", 28944],
+      ["durian+46.20", 166789],
+      ["disco+wet+cranberry+1.24", 384357],
+      ["wet+glowshroom+0.73", 574],
+      ["wet+moonflower+2.11", 21147],
+      ["frozen+shocked+mushroom+1.00", 14854248],
+      ["wet+beanstalk+12.86", 66152],
+      ["wet+mango+17.50", 17705],
+      ["wet+blueberry+0.22", 49],
+      ["wet+gold+blueberry+0.27", 1471],
+      ["wet+blood+banana+1.95", 20374],
+      ["blood+banana+2.09", 11676],
+      ["wet+corn+2.49", 124],
+      ["wet+apple+3.36", 691],
+      ["wet+tomato+0.67", 109],
+      ["bloodlit+wet+durian+8.48", 28090],
+      ["celestial+wet+durian+8.81", 733382],
+      ["tomato+0.68", 56],
+      ["choc+wet+shocked+mushroom+1.00", 13900305]
+    ]);
 
-    function normalizeModifiers(mods) {
-      return mods.sort().join(',');
+    const plantSel = document.getElementById("plant");
+    plants.forEach(p => plantSel.innerHTML += `<option>${p}</option>`);
+
+    const modDiv = document.getElementById("modifiers");
+    modifiers.forEach(m => {
+      const id = `mod-${m.toLowerCase()}`;
+      modDiv.innerHTML += `<label><input type="checkbox" id="${id}" value="${m.toLowerCase()}"> ${m}</label>`;
+    });
+
+    function normalizeKey(mods, plant, weight) {
+      return [...mods.sort(), plant.toLowerCase(), (+weight).toFixed(3)].join("+");
     }
 
-    function calculate() {
-      const plant = document.getElementById('plant').value;
-      const weight = parseFloat(document.getElementById('weight').value);
-      const modifierEls = Array.from(document.getElementById('modifier').selectedOptions);
-      const modifiers = modifierEls.map(opt => opt.value);
+    function bestMatch(mods, plant, weight) {
+      const base = plant.toLowerCase() + "+" + (+weight).toFixed(3);
+      let best = null;
+      for (const [key, price] of knownData.entries()) {
+        if (key.endsWith(base) && mods.every(m => key.includes(m))) {
+          best = { key, price };
+        }
+      }
+      return best;
+    }
 
-      if (isNaN(weight) || weight <= 0) {
-        document.getElementById('result').textContent = 'Enter a valid weight.';
-        return;
+    function calculatePrice() {
+      const plant = plantSel.value;
+      const weight = parseFloat(document.getElementById("weight").value);
+      const mods = Array.from(document.querySelectorAll("#modifiers input:checked")).map(x => x.value);
+      const key = normalizeKey(mods, plant, weight);
+      let price = knownData.get(key);
+
+      if (!price) {
+        const match = bestMatch(mods, plant, weight);
+        if (match) price = match.price;
       }
 
-      const match = startingData.find(entry =>
-        entry.plant === plant &&
-        normalizeModifiers(entry.modifiers) === normalizeModifiers(modifiers)
-      );
-
-      if (match) {
-        const price = (match.price / match.weight) * weight;
-        document.getElementById('result').textContent = `Estimated Price: $${price.toFixed(2)}`;
+      if (price) {
+        document.getElementById("result").innerText = `Estimated Price: $${price.toLocaleString()}`;
       } else {
-        document.getElementById('result').textContent = 'No matching data. Please consider submitting a correction.';
+        document.getElementById("result").innerText = "Unknown combination. Logging for learning...";
+        db.ref("pending/" + btoa(key)).set({ plant, weight, modifiers: mods, timestamp: Date.now() });
       }
     }
 
-    function submitCorrection() {
-      const plant = document.getElementById('plant').value;
-      const weight = parseFloat(document.getElementById('weight').value);
-      const modifierEls = Array.from(document.getElementById('modifier').selectedOptions);
-      const modifiers = modifierEls.map(opt => opt.value);
-      const correctPrice = parseFloat(document.getElementById('correctPrice').value);
-      const correctionMsg = document.getElementById('correctionMsg');
-
-      if (isNaN(weight) || weight <= 0 || isNaN(correctPrice) || correctPrice <= 0) {
-        correctionMsg.textContent = 'Please enter valid weight and price.';
-        correctionMsg.style.color = 'red';
-        return;
-      }
-
-      const perKg = correctPrice / weight;
-
-      // Check if it's consistent (within 25%) of existing entries for same plant/modifier
-      const matches = startingData.filter(entry =>
-        entry.plant === plant &&
-        normalizeModifiers(entry.modifiers) === normalizeModifiers(modifiers)
-      );
-
-      let valid = false;
-      if (matches.length === 0) {
-        valid = true; // accept new combination
-      } else {
-        valid = matches.some(entry => {
-          const entryPerKg = entry.price / entry.weight;
-          const lower = entryPerKg * 0.75;
-          const upper = entryPerKg * 1.25;
-          return perKg >= lower && perKg <= upper;
+    let adminShown = false;
+    function toggleAdminPending() {
+      adminShown = !adminShown;
+      document.getElementById("adminPanel").style.display = adminShown ? "block" : "none";
+      if (adminShown) {
+        db.ref("pending").once("value", snap => {
+          const ul = document.getElementById("pendingList");
+          ul.innerHTML = "";
+          for (const [key, val] of Object.entries(snap.val() || {})) {
+            const li = document.createElement("li");
+            li.innerText = `${val.modifiers.join(", ")} ${val.plant} ${val.weight}kg`;
+            const approveBtn = document.createElement("button");
+            approveBtn.innerText = "Approve";
+            approveBtn.onclick = () => {
+              const id = normalizeKey(val.modifiers, val.plant, val.weight);
+              knownData.set(id, prompt("Enter correct price for this item:"));
+              db.ref("pending/" + key).remove();
+              toggleAdminPending();
+            };
+            const rejectBtn = document.createElement("button");
+            rejectBtn.innerText = "Reject";
+            rejectBtn.onclick = () => { db.ref("pending/" + key).remove(); toggleAdminPending(); };
+            li.appendChild(approveBtn);
+            li.appendChild(rejectBtn);
+            ul.appendChild(li);
+          }
         });
-      }
-
-      if (valid) {
-        const newEntry = { plant, modifiers, weight, price: correctPrice };
-        startingData.push(newEntry);
-        db.ref("corrections").push(newEntry);
-        correctionMsg.textContent = 'Thank you! Correction accepted and added.';
-        correctionMsg.style.color = 'green';
-      } else {
-        correctionMsg.textContent = 'Correction rejected: seems inconsistent with trusted data.';
-        correctionMsg.style.color = 'red';
       }
     }
   </script>
