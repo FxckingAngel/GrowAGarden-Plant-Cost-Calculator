@@ -71,7 +71,8 @@ legend {
 }
 
   </style>
-
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
   <h1>🌱 GrowAGarden Plant Cost Calculator</h1>
@@ -110,58 +111,84 @@ legend {
   <input type="number" id="weight" placeholder="e.g. 0.17" step="0.01" />
 
   <div class="output" id="result">💰 Total Value: 0 Sheckles</div>
+<div id="reportForm">
+    <h2>📢 Report Wrong Price</h2>
+    <input type="text" id="userPlantName" placeholder="Plant name" />
+    <textarea id="userReason" rows="3" placeholder="Why is it wrong?"></textarea>
+    <button id="submitReport">Submit Report</button>
+  </div>
 
+  <div id="adminPanel">
+    <h2>🔒 Admin View</h2>
+    <input type="password" id="adminPassword" placeholder="Enter admin password" />
+    <button id="viewReports">View Reports</button>
+    <ul id="wrongList"></ul>
+  </div>
 <script>
-  const plantBaseValues = {
-    "apple": 248,
-    "banana": 1579,
-    "bamboo": 3610,
-    "beanstalk": 18050,
-    "blood banana": 5415,
-    "blueberry": 18,
-    "cactus": 3068,
-    "cacao": 9928,
-    "carrot": 18,
-    "cherry blossom": 550,
-    "corn": 36,
-    "cranberry": 1805,
-    "coconut": 361,
-    "cursed fruit": 15000,
-    "candy blossom": 93567,
-    "candy sunflower": 145000,
-    "daffodil": 903,
-    "dragonfruit": 4287,
-    "durian": 4513,
-    "eggplant": 6769,
-    "easter egg": 4513,
-    "glowshroom": 175,
-    "grape": 7085,
-    "lemon": 500,
-    "mango": 5866,
-    "mint": 0,
-    "moon mango": 22563,
-    "moon blossom": 45125,
-    "moon melon": 16245,
-    "moonflower": 8500,
-    "moonglow": 18000,
-    "mushroom": 136278,
-    "nightshade": 2000,
-    "orange tulip": 767,
-    "papaya": 1000,
-    "passionfruit": 3204,
-    "peach": 271,
-    "pear": 500,
-    "pepper": 7220,
-    "pineapple": 1805,
-    "pumpkin": 3700,
-    "raspberry": 90,
-    "soulfruit": 3000,
-    "starfruit": 15538,
-    "strawberry": 14,
-    "tomato": 27,
-    "venus fly trap": 17000,
-    "watermelon": 2708
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMCSyGIAUsMpRE-pDY3uwwMg7IMwmLig",
+      authDomain: "growagardenplantcostcalculator.firebaseapp.com",
+      databaseURL: "https://growagardenplantcostcalculator-default-rtdb.firebaseio.com",
+      projectId: "growagardenplantcostcalculator",
+      storageBucket: "growagardenplantcostcalculator.firebasestorage.app",
+      messagingSenderId: "410113480248",
+      appId: "1:410113480248:web:72badb81206b458ecd38cd",
+      measurementId: "G-K7XD9NMRGZ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+{
+  "apple": 30.5250,
+  "banana": 777.7778,
+  "bamboo": 250.0000,
+  "beanstalk": 200.0000,
+  "blood banana": 5415,
+  "blueberry": 500.0000,
+  "cactus": 69.3850,
+  "cacao": 171.8750,
+  "carrot": 265.0000,
+  "cherry blossom": 550,
+  "corn": 10.0000,
+  "cranberry": 2000.0000,
+  "coconut": 2.0400,
+  "cursed fruit": 15000,
+  "candy blossom": 11570.0000,
+  "candy sunflower": 145000,
+  "daffodil": 25000.0000,
+  "dragonfruit": 32.9750,
+  "durian": 78.1250,
+  "eggplant": 300.0000,
+  "easter egg": 277.8750,
+  "glowshroom": 175,
+  "grape": 872.3250,
+  "lemon": 500,
+  "mango": 29.0725,
+  "mint": 5250.0000,
+  "moon mango": 22563,
+  "moon blossom": 45125,
+  "moon melon": 16245,
+  "moonflower": 2375.0000,
+  "moonglow": 18000,
+  "mushroom": 241.6000,
+  "nightshade": 2000,
+  "orange tulip": 340000.0000,
+  "papaya": 1000,
+  "passionfruit": 394.5000,
+  "peach": 75.0000,
+  "pear": 500,
+  "pepper": 320.0000,
+  "pineapple": 1805,
+  "pumpkin": 3700,
+  "raspberry": 178.0000,
+  "soulfruit": 3000,
+  "starfruit": 15538,
+  "strawberry": 170.0000,
+  "tomato": 120.0000,
+  "venus fly trap": 17000,
+  "watermelon": 2708
+}
+
 
   const stackValues = {
     "Wet 💧": 0.1,
