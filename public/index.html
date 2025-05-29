@@ -1,51 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🌱 GrowAGarden Plant Cost Calculator</title>
+  <title>GrowAGarden Plant Cost Calculator</title>
   <style>
-    :root {
-      color-scheme: dark;
-    }
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #121212;
-      color: #e0e0e0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      color: #ffffff;
+      margin: 0;
       padding: 2rem;
     }
-    label {
-      font-size: 1.2rem;
+    label, select, input {
+      display: block;
+      margin-bottom: 1rem;
     }
-    select, option, input[type="checkbox"] {
+    select, input {
+      padding: 0.5rem;
       font-size: 1rem;
-      margin: 0.5rem;
+      background-color: #1e1e1e;
+      color: #ffffff;
+      border: 1px solid #444;
+      border-radius: 0.5rem;
     }
-    .result {
+    .output {
       margin-top: 2rem;
       font-size: 1.5rem;
-      color: #00e676;
-    }
-    .env-label {
-      display: inline-block;
-      margin: 0.3rem 1rem 0.3rem 0;
-    }
-    .container {
-      max-width: 700px;
-      width: 100%;
+      color: #90ee90;
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>🌿 GrowAGarden Plant Cost Calculator</h1>
+  <h1>🌱 GrowAGarden Plant Cost Calculator</h1>
 
-    <label for="plant">🌿 Plant Type</label>
+<label for="plant">🌿 Plant Type</label>
     <select id="plant">
       <option value="apple">🍎 Apple</option>
       <option value="banana">🍌 Banana</option>
@@ -93,7 +82,7 @@
       <option value="watermelon">🍉 Watermelon</option>
     </select>
 
-    <label for="mutation">🧬 Growth Mutation</label>
+<label for="mutation">🧬 Growth Mutation</label>
     <select id="mutation">
       <option value="1">None</option>
       <option value="20">Golden ✨</option>
@@ -116,47 +105,47 @@
       <label class="env-label"><input type="checkbox" value="119" /> Celestial ✨</label>
       <label class="env-label"><input type="checkbox" value="124" /> Disco 💃</label>
     </fieldset>
+  <label for="weight">⚖️ Input Weight (kg)</label>
+  <input type="number" id="weight" placeholder="e.g. 0.17" step="0.01" />
 
-    <div class="result" id="result">💰 Total Value: 0 Sheckles</div>
-  </div>
+  <div class="output" id="result">💰 Total Value: 0 Sheckles</div>
 
   <script>
-    const plantSelect = document.getElementById('plant');
-    const mutationSelect = document.getElementById('mutation');
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    const result = document.getElementById('result');
-
-    const baseValues = {
+    const plantBaseValues = {
       "apple": 248,
       "banana": 1579,
       "bamboo": 3610,
       "beanstalk": 18050,
       "blood banana": 5415,
       "blueberry": 18,
-      "cacao": 9928,
       "cactus": 3068,
+      "cacao": 9928,
       "carrot": 18,
       "cherry blossom": 550,
-      "coconut": 361,
       "corn": 36,
       "cranberry": 1805,
+      "coconut": 361,
+      "cursed fruit": 15000,
+      "candy blossom": 93567,
+      "candy sunflower": 145000,
       "daffodil": 903,
       "dragonfruit": 4287,
       "durian": 4513,
       "eggplant": 6769,
-      "glowshroom": 150,
+      "easter egg": 4513,
+      "glowshroom": 175,
       "grape": 7085,
       "lemon": 500,
       "mango": 5866,
       "mint": 0,
-      "moon blossom": 45125,
-      "moonglow": 18000,
       "moon mango": 22563,
+      "moon blossom": 45125,
       "moon melon": 16245,
-      "moonflower": 7000,
+      "moonflower": 8500,
+      "moonglow": 18000,
       "mushroom": 136278,
       "nightshade": 2000,
-      "orangetulip": 767,
+      "orange tulip": 767,
       "papaya": 1000,
       "passionfruit": 3204,
       "peach": 271,
@@ -173,25 +162,73 @@
       "watermelon": 2708
     };
 
-    function calculate() {
+    const mutations = {
+      "Wet": 1,
+      "Chilled": 1,
+      "Chocolate": 1,
+      "Moonlit": 1,
+      "Bloodlit": 3,
+      "Plasma": 4,
+      "Frozen": 9,
+      "Zombified": 24,
+      "Shocked": 99,
+      "Celestial": 119,
+      "Disco": 124
+    };
+
+    const plantSelect = document.getElementById("plant");
+    Object.keys(plantBaseValues).sort().forEach(p => {
+      const option = document.createElement("option");
+      option.value = p;
+      option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+      plantSelect.appendChild(option);
+    });
+
+    const mutationSelect = document.getElementById("mutations");
+    Object.entries(mutations).forEach(([key, val]) => {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = key + ` (+${val})`;
+      mutationSelect.appendChild(option);
+    });
+
+    document.querySelectorAll("#plant, #mutations, #growth, #weight").forEach(el => {
+      el.addEventListener("input", updateValue);
+    });
+
+    function updateValue() {
       const plant = plantSelect.value;
-      const base = baseValues[plant] || 0;
-      const mutation = parseFloat(mutationSelect.value);
-      let stackSum = 0;
-      checkboxes.forEach(cb => {
-        if (cb.checked) stackSum += parseFloat(cb.value);
+      const base = plantBaseValues[plant] || 0;
+      const weight = parseFloat(document.getElementById("weight").value || 1);
+      const growth = parseFloat(document.getElementById("growth").value || 1);
+
+      const selectedMutations = Array.from(mutationSelect.selectedOptions).map(opt => opt.value);
+      let stack = 0;
+
+      const envTypeCounts = {
+        Wet: 0,
+        Chilled: 0,
+        Frozen: 0
+      };
+
+      selectedMutations.forEach(m => {
+        if (["Wet", "Chilled", "Frozen"].includes(m)) {
+          envTypeCounts[m]++;
+        }
+        stack += mutations[m] || 0;
       });
-      const total = Math.round(base * mutation * (1 + stackSum));
-      result.textContent = `💰 Total Value: ${total.toLocaleString()} Sheckles`;
+
+      // Enforce one of Wet/Chilled/Frozen rule
+      if (envTypeCounts.Frozen > 0) {
+        stack -= envTypeCounts.Wet * mutations["Wet"];
+        stack -= envTypeCounts.Chilled * mutations["Chilled"];
+      } else if (envTypeCounts.Wet > 0 && envTypeCounts.Chilled > 0) {
+        stack -= envTypeCounts.Chilled * mutations["Chilled"];
+      }
+
+      const total = Math.round(base * growth * (1 + stack) * weight);
+      document.getElementById("result").textContent = `💰 Total Value: ${total.toLocaleString()} Sheckles`;
     }
-
-    plantSelect.addEventListener('change', calculate);
-    mutationSelect.addEventListener('change', calculate);
-    checkboxes.forEach(cb => cb.addEventListener('change', calculate));
-
-    // Initial calculation
-    calculate();
   </script>
 </body>
-
 </html>
