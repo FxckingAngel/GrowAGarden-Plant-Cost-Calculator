@@ -149,7 +149,7 @@
 <div class="output" id="result">💰 Total Value: 0 Sheckles</div>
 <div class="output" id="formula" style="font-size:1rem; color:#aaa; margin-top:0.5rem;"></div>
 
-  <script>
+<script>
     const plantBaseValues = {
       "apple": 30.5250, "banana": 777.7778,  "bamboo": 250.0000, "beanstalk": 200.0000,
       "blood banana": 5415, "blueberry": 500.0000, "cactus": 69.3850, "cacao": 171.8750,
@@ -186,6 +186,8 @@
     const mutationSelect = document.getElementById("mutation");
     const weightInput = document.getElementById("weight");
     const envCheckboxes = document.querySelectorAll(".stack-item input");
+    const result = document.getElementById("result");
+    const formula = document.getElementById("formula");
 
     document.querySelectorAll("#plant, #mutation, #weight").forEach(el => {
       el.addEventListener("input", updateValue);
@@ -193,38 +195,42 @@
     envCheckboxes.forEach(cb => cb.addEventListener("input", updateValue));
 
     function updateValue() {
-  const plant = plantSelect.value;
-  const base = plantBaseValues[plant] || 0;
-  const growth = parseFloat(mutationSelect.value || 1);
-  const weight = parseFloat(weightInput.value || 1);
+      const plant = plantSelect.value;
+      const base = plantBaseValues[plant] || 0;
+      const growth = parseFloat(mutationSelect.value || 1);
+      const weight = parseFloat(weightInput.value || 1);
 
-  let wet = false, chilled = false, frozen = false;
-  let stackMultiplier = 0;
+      let wet = false, chilled = false, frozen = false;
+      let stackMultiplier = 0;
+      let activeStacks = [];
 
-  envCheckboxes.forEach(cb => {
-    if (cb.checked) {
-      const label = cb.value;
-      if (label.includes("Wet")) wet = true;
-      if (label.includes("Chilled")) chilled = true;
-      if (label.includes("Frozen")) frozen = true;
-      stackMultiplier += stackValues[label] || 0;
+      envCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          const label = cb.value;
+          activeStacks.push(label);
+          if (label.includes("Wet")) wet = true;
+          if (label.includes("Chilled")) chilled = true;
+          if (label.includes("Frozen")) frozen = true;
+          stackMultiplier += stackValues[label] || 0;
+        }
+      });
+
+      // Special logic to handle overlapping stacks
+      if (frozen) {
+        if (wet) stackMultiplier -= (stackValues["Wet 💧"] || 0);
+        if (chilled) stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
+      } else if (wet && chilled) {
+        stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
+      }
+
+      const total = base * weight * growth * (1 + stackMultiplier);
+      result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
+
+      const formulaText = `Base (${base}) × Weight (${weight}) × Mutation (${growth}) × (1 + Stacks ${stackMultiplier.toFixed(2)})`;
+      formula.textContent = `🧮 ${formulaText}`;
     }
-  });
 
-  // Special environmental interaction logic
-  if (frozen) {
-    if (wet) stackMultiplier -= (stackValues["Wet 💧"] || 0);
-    if (chilled) stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
-  } else if (wet && chilled) {
-    stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
-  }
-
-  const finalValue = base * weight * (1 + stackMultiplier) * (1 + growth / 100);
-  document.getElementById("result").textContent = `💰 Total Value: ${finalValue.toFixed(2)} Sheckles`;
-  document.getElementById("formula").textContent =
-    `Base: ${base} × Weight: ${weight} × Mutation: +${growth}% × Stack Multiplier: +${(stackMultiplier * 100).toFixed(1)}%`;
-}
-
+    updateValue(); // Initial call on load
   </script>
 </body>
 </html>
