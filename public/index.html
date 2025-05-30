@@ -151,7 +151,7 @@
 
   <script>
     const plantBaseValues = {
-      "apple": 30.5250, banana": 777.7778,  "bamboo": 250.0000, "beanstalk": 200.0000,
+      "apple": 30.5250, "banana": 777.7778,  "bamboo": 250.0000, "beanstalk": 200.0000,
       "blood banana": 5415, "blueberry": 500.0000, "cactus": 69.3850, "cacao": 171.8750,
       "carrot": 265.0000, "cherry blossom": 550, "corn": 10.0000, "cranberry": 2000.0000,
       "coconut": 2.0400, "cursed fruit": 15000, "candy blossom": 11570.0000,
@@ -219,19 +219,12 @@
     stackMultiplier -= (stackValues["Chilled ❄️"] || 0);
   }
 
-  const total = Math.round(base * (1 + stackMultiplier) * growth * weight);
-  document.getElementById("result").textContent = `💰 Total Value: ${total.toLocaleString()} Sheckles`;
-
-  // Show formula with current values
-  const formulaText = `
-    Formula: Total = Base × (1 + Stack Multiplier) × Growth Mutation × Weight
-    <br/>
-    Total = ${base.toFixed(4)} × (1 + ${stackMultiplier.toFixed(4)}) × ${growth.toFixed(4)} × ${weight.toFixed(4)}
-    <br/>
-    Total = ${total.toLocaleString()} Sheckles
-  `;
-  document.getElementById("formula").innerHTML = formulaText;
+  const finalValue = base * weight * (1 + stackMultiplier) * (1 + growth / 100);
+  document.getElementById("result").textContent = `💰 Total Value: ${finalValue.toFixed(2)} Sheckles`;
+  document.getElementById("formula").textContent =
+    `Base: ${base} × Weight: ${weight} × Mutation: +${growth}% × Stack Multiplier: +${(stackMultiplier * 100).toFixed(1)}%`;
 }
+
   </script>
 </body>
 </html>
