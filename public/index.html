@@ -139,6 +139,15 @@
       }
     });
 
+const plantSelect = document.getElementById("plant");
+Object.keys(plantBaseValues).sort().forEach(p => {
+  const option = document.createElement("option");
+  option.value = p;
+  option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+  plantSelect.appendChild(option);
+});
+
+
     const total = CONSTANT * (weight ** 2) * growth * envMultiplier;
     result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
 
