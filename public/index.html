@@ -192,12 +192,13 @@
     const plant = plantSelect.value;
     const base = plantBaseValues[plant] || 1;
 
-    let envMultiplier = 1;
-    envCheckboxes.forEach(cb => {
-      if (cb.checked) {
-        envMultiplier *= stackMultipliers[cb.value] || 1;
-      }
-    });
+let envMultiplier = 1;
+envCheckboxes.forEach(cb => {
+  if (cb.checked) {
+    envMultiplier += (stackMultipliers[cb.value] || 0) - 1;
+  }
+});
+
 
     const total = base * (weight ** 2) * growth * envMultiplier;
     result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
