@@ -179,38 +179,30 @@ const plantBaseValues = {
   envCheckboxes.forEach(cb => cb.addEventListener("input", updateValue));
 
   function updateValue() {
-    const growth = parseFloat(mutationSelect.value || 1);
-    const weight = parseFloat(weightInput.value || 0);
+  const growth = parseFloat(mutationSelect.value || 1);
+  const weight = parseFloat(weightInput.value || 0);
 
-    let envMultiplier = 1;
-    let activeStacks = [];
+  const selectedPlant = plantSelect.value;
+  const baseValue = plantBaseValues[selectedPlant] || 1; // fallback to 1 if something goes wrong
 
-    envCheckboxes.forEach(cb => {
-      if (cb.checked) {
-        const label = cb.value;
-        activeStacks.push(label);
-        const mult = stackMultipliers[label] || 1;
-        envMultiplier *= mult;
-      }
-    });
+  let envMultiplier = 1;
+  let activeStacks = [];
 
-const plantSelect = document.getElementById("plant");
-Object.keys(plantBaseValues).sort().forEach(p => {
-  const option = document.createElement("option");
-  option.value = p;
-  option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
-  plantSelect.appendChild(option);
-});
+  envCheckboxes.forEach(cb => {
+    if (cb.checked) {
+      const label = cb.value;
+      activeStacks.push(label);
+      const mult = stackMultipliers[label] || 1;
+      envMultiplier *= mult;
+    }
+  });
 
+  const total = baseValue * (weight ** 2) * growth * envMultiplier;
+  result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
 
-    const total = CONSTANT * (weight ** 2) * growth * envMultiplier;
-    result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
-
-    const formulaText = `Constant (${CONSTANT}) × Weight^2 (${weight}²) × Growth (${growth}) × Env Multiplier (${envMultiplier.toFixed(2)})`;
-    formula.textContent = `🧮 ${formulaText}`;
-  }
-
-  updateValue(); // Initial call on load
+  const formulaText = `Base (${baseValue}) × Weight² (${weight}²) × Growth (${growth}) × Env Multiplier (${envMultiplier.toFixed(2)})`;
+  formula.textContent = `🧮 ${formulaText}`;
+}
 </script>
 </body>
 </html>
