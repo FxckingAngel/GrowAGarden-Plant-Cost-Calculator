@@ -113,57 +113,66 @@
     "Rainbow 🌈": 1.5, "Shocked ⚡": 1.2, "Celestial 🌌": 1.35,
     "Disco 🕺": 1.15
   };
-const plantBaseValues = {
-  "apple": 30.5556,
-  "bamboo": 250.0,
-  "banana": 777.7778,
-  "beanstalk": 200.0,
-  "blood banana": 2666.6667,
-  "blueberry": 500.0,
-  "cacao": 171.875,
-  "cactus": 69.3764,
-  "candy blossom": 11111.1111,
-  "candy sunflower": 35545.0,
-  "carrot": 265.0,
-  "celestiberry": 2500.0,
-  "cherry blossom": 550.0,
-  "coconut": 2.0408,
-  "corn": 10.0,
-  "cranberry": 2000.0,
-  "daffodil": 25000.0,
-  "dragon fruit": 32.9875,
-  "durian": 78.125,
-  "easter egg": 277.7778,
-  "eggplant": 300.0,
-  "glowmelon": 221.25,
-  "glowshroom": 533.3333,
-  "grape": 872.2222,
-  "lemon": 500.0,
-  "lotus": 42.5,
-  "mango": 29.125,
-  "mint": 5250.0,
-  "moon blossom": 5555.5556,
-  "moon mango": 222.2222,
-  "moon melon": 281.25,
-  "moonflower": 2375.0,
-  "moonglow": 649.9125,
-  "mushroom": 241.6,
-  "nightshade": 14000.0,
-  "orange tulip": 340000.0,
-  "passionfruit": 394.5,
-  "peach": 75.0,
-  "pear": 75.0,
-  "pepper": 320.0,
-  "pineapple": 222.2222,
-  "raspberry": 178.5,
-  "soulfruit": 3000.0,
-  "starfruit": 1666.6667,
-  "strawberry": 170.0,
-  "tomato": 120.0,
-  "venus fly trap": 250.0,
-  "watermelon": 2708.3333
-};
 
+  const plantBaseValues = {
+    "apple": 30.5556,
+    "bamboo": 250.0,
+    "banana": 777.7778,
+    "beanstalk": 200.0,
+    "blood banana": 2666.6667,
+    "blueberry": 500.0,
+    "cacao": 171.875,
+    "cactus": 69.3764,
+    "candy blossom": 11111.1111,
+    "candy sunflower": 35545.0,
+    "carrot": 265.0,
+    "celestiberry": 2500.0,
+    "cherry blossom": 550.0,
+    "coconut": 2.0408,
+    "corn": 10.0,
+    "cranberry": 2000.0,
+    "daffodil": 25000.0,
+    "dragon fruit": 32.9875,
+    "durian": 78.125,
+    "easter egg": 277.7778,
+    "eggplant": 300.0,
+    "glowmelon": 221.25,
+    "glowshroom": 533.3333,
+    "grape": 872.2222,
+    "lemon": 500.0,
+    "lotus": 42.5,
+    "mango": 29.125,
+    "mint": 5250.0,
+    "moon blossom": 5555.5556,
+    "moon mango": 222.2222,
+    "moon melon": 281.25,
+    "moonflower": 2375.0,
+    "moonglow": 649.9125,
+    "mushroom": 241.6,
+    "nightshade": 14000.0,
+    "orange tulip": 340000.0,
+    "passionfruit": 394.5,
+    "peach": 75.0,
+    "pear": 75.0,
+    "pepper": 320.0,
+    "pineapple": 222.2222,
+    "raspberry": 178.5,
+    "soulfruit": 3000.0,
+    "starfruit": 1666.6667,
+    "strawberry": 170.0,
+    "tomato": 120.0,
+    "venus fly trap": 250.0,
+    "watermelon": 2708.3333
+  };
+
+  // Populate dropdown alphabetically
+  const plantSelect = document.getElementById("plant");
+  Object.keys(plantBaseValues).sort().forEach(p => {
+    const option = document.createElement("option");
+    option.value = p;
+    option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+    plantSelect.appendChild(option);
+  });
 
   const mutationSelect = document.getElementById("mutation");
   const weightInput = document.getElementById("weight");
@@ -171,38 +180,34 @@ const plantBaseValues = {
   const result = document.getElementById("result");
   const formula = document.getElementById("formula");
 
-  const CONSTANT = 269.37;
-
-  document.querySelectorAll("#mutation, #weight").forEach(el => {
-    el.addEventListener("input", updateValue);
-  });
+  // Update when plant selection changes
+  plantSelect.addEventListener("change", updateValue);
+  mutationSelect.addEventListener("input", updateValue);
+  weightInput.addEventListener("input", updateValue);
   envCheckboxes.forEach(cb => cb.addEventListener("input", updateValue));
 
   function updateValue() {
-  const growth = parseFloat(mutationSelect.value || 1);
-  const weight = parseFloat(weightInput.value || 0);
+    const growth = parseFloat(mutationSelect.value || 1);
+    const weight = parseFloat(weightInput.value || 0);
+    const plant = plantSelect.value;
+    const base = plantBaseValues[plant] || 1;
 
-  const selectedPlant = plantSelect.value;
-  const baseValue = plantBaseValues[selectedPlant] || 1; // fallback to 1 if something goes wrong
+    let envMultiplier = 1;
+    envCheckboxes.forEach(cb => {
+      if (cb.checked) {
+        envMultiplier *= stackMultipliers[cb.value] || 1;
+      }
+    });
 
-  let envMultiplier = 1;
-  let activeStacks = [];
+    const total = base * (weight ** 2) * growth * envMultiplier;
+    result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
 
-  envCheckboxes.forEach(cb => {
-    if (cb.checked) {
-      const label = cb.value;
-      activeStacks.push(label);
-      const mult = stackMultipliers[label] || 1;
-      envMultiplier *= mult;
-    }
-  });
+    const formulaText = `Base (${base}) × Weight² (${weight}²) × Growth (${growth}) × Env Multiplier (${envMultiplier.toFixed(2)})`;
+    formula.textContent = `🧮 ${formulaText}`;
+  }
 
-  const total = baseValue * (weight ** 2) * growth * envMultiplier;
-  result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
-
-  const formulaText = `Base (${baseValue}) × Weight² (${weight}²) × Growth (${growth}) × Env Multiplier (${envMultiplier.toFixed(2)})`;
-  formula.textContent = `🧮 ${formulaText}`;
-}
+  updateValue(); // Run on load
 </script>
+
 </body>
 </html>
