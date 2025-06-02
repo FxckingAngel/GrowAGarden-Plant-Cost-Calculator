@@ -192,7 +192,7 @@ const plantBaseValues = {
     const growth = parseFloat(mutationSelect.value || 1);
     const weight = parseFloat(weightInput.value || 0);
     const plant = plantSelect.value;
-    const base = plantBaseValues[plant] || 1;
+    const base = (plantBaseValues[plant] || 1) / 100; // convert from cents to shekles
 
     let envMultiplier = 1;
     envCheckboxes.forEach(cb => {
