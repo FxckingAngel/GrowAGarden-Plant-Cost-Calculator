@@ -69,105 +69,116 @@
 <body>
   <h1>🌱 GrowAGarden Plant Cost Calculator</h1>
 
-<label for="plant">🌿 Select Plant</label>
-<select id="plant"></select>
-
-
-  <label for="mutation">🧬 Growth Mutation</label>
-  <select id="mutation">
-    <option value="1">None</option>
-    <option value="20">Golden ✨</option>
-    <option value="50">Rainbow 🌈</option>
-  </select>
+  <label for="plant">🌿 Select Plant</label>
+  <select id="plant"></select>
 
   <fieldset>
-    <legend>🌐 Environmental Stacks</legend>
+    <legend>🧬 Base Mutation Multiplier</legend>
+    <label><input type="radio" name="baseMutation" value="1" checked /> None (×1)</label>
+    <label><input type="radio" name="baseMutation" value="20" /> Golden ✨ (×20)</label>
+    <label><input type="radio" name="baseMutation" value="50" /> Rainbow 🌈 (×50)</label>
+  </fieldset>
+
+  <fieldset>
+    <legend>🧬 Growth Mutation Stack Bonuses (Select all that apply)</legend>
     <div class="stack-grid">
-      <label class="stack-item"><input type="checkbox" value="Wet 💧" /> Wet 💧</label>
-      <label class="stack-item"><input type="checkbox" value="Chilled ❄️" /> Chilled ❄️</label>
-      <label class="stack-item"><input type="checkbox" value="Chocolate 🍫" /> Chocolate 🍫</label>
-      <label class="stack-item"><input type="checkbox" value="Moonlit 🌙" /> Moonlit 🌙</label>
-      <label class="stack-item"><input type="checkbox" value="Bloodlit 🔥" /> Bloodlit 🔥</label>
-      <label class="stack-item"><input type="checkbox" value="Plasma ⚡" /> Plasma ⚡</label>
-      <label class="stack-item"><input type="checkbox" value="Frozen 🧊" /> Frozen 🧊</label>
-      <label class="stack-item"><input type="checkbox" value="Zombified 🧟" /> Zombified 🧟</label>
-      <label class="stack-item"><input type="checkbox" value="Twisted 🌀" /> Twisted 🌀</label>
-      <label class="stack-item"><input type="checkbox" value="Rainbow 🌈" /> Rainbow 🌈</label>
-      <label class="stack-item"><input type="checkbox" value="Shocked ⚡" /> Shocked ⚡</label>
-      <label class="stack-item"><input type="checkbox" value="Celestial 🌌" /> Celestial 🌌</label>
-      <label class="stack-item"><input type="checkbox" value="Disco 🕺" /> Disco 🕺</label>
+      <label class="stack-item"><input type="checkbox" value="Wet" /> Wet 💧 (+1)</label>
+      <label class="stack-item"><input type="checkbox" value="Chilled" /> Chilled ❄️ (+1)</label>
+      <label class="stack-item"><input type="checkbox" value="Chocolate" /> Chocolate 🍫 (+1)</label>
+      <label class="stack-item"><input type="checkbox" value="Moonlit" /> Moonlit 🌙 (+1)</label>
+      <label class="stack-item"><input type="checkbox" value="Pollinated" /> Pollinated 🌼 (+2)</label>
+      <label class="stack-item"><input type="checkbox" value="Bloodlit" /> Bloodlit 🔥 (+3)</label>
+      <label class="stack-item"><input type="checkbox" value="Plasma" /> Plasma ⚡ (+4)</label>
+      <label class="stack-item"><input type="checkbox" value="Honey Glazed" /> Honey Glazed 🍯 (+4)</label>
+      <label class="stack-item"><input type="checkbox" value="Frozen" /> Frozen 🧊 (+9)</label>
+      <label class="stack-item"><input type="checkbox" value="Zombified" /> Zombified 🧟 (+24)</label>
+      <label class="stack-item"><input type="checkbox" value="Shocked" /> Shocked ⚡ (+99)</label>
+      <label class="stack-item"><input type="checkbox" value="Celestial" /> Celestial 🌌 (+119)</label>
+      <label class="stack-item"><input type="checkbox" value="Disco" /> Disco 🕺 (+124)</label>
+      <label class="stack-item"><input type="checkbox" value="Voidtouched" /> Voidtouched 🕳️ (+134)</label>
     </div>
   </fieldset>
 
   <label for="weight">⚖️ Input Weight (kg)</label>
   <input type="number" id="weight" placeholder="e.g. 0.17" step="0.01" />
 
-<div class="output" id="result">💰 Total Value: 0 Sheckles</div>
-<div class="output" id="formula" style="font-size:1rem; color:#aaa; margin-top:0.5rem;"></div>
+  <div class="output" id="result">💰 Total Value: 0 Sheckles</div>
+  <div class="output" id="formula" style="font-size:1rem; color:#aaa; margin-top:0.5rem;"></div>
 
 <script>
-  const stackMultipliers = {
-    "Wet 💧": 1.1, "Chilled ❄️": 1.1, "Chocolate 🍫": 1.15,
-    "Moonlit 🌙": 1.2, "Bloodlit 🔥": 1.2, "Plasma ⚡": 1.3,
-    "Frozen 🧊": 6.87, "Zombified 🧟": 1.2, "Twisted 🌀": 1.25,
-    "Rainbow 🌈": 1.5, "Shocked ⚡": 1.2, "Celestial 🌌": 1.35,
-    "Disco 🕺": 1.15
+  // Base values for plants
+  const plantBaseValues = {
+    "carrot": 265.0,
+    "strawberry": 170.0,
+    "blueberry": 500.0,
+    "orange tulip": 340000.0,
+    "tomato": 120.0,
+    "cactus": 69.3764,
+    "apple": 30.5556,
+    "banana": 777.7778,
+    "bamboo": 250.0,
+    "beanstalk": 200.0,
+    "blood banana": 2666.6667,
+    "cacao": 171.875,
+    "candy blossom": 11111.1111,
+    "candy sunflower": 35545.0,
+    "celestiberry": 2500.0,
+    "cherry blossom": 550.0,
+    "coconut": 2.0408,
+    "corn": 10.0,
+    "cranberry": 2000.0,
+    "daffodil": 25000.0,
+    "dragon fruit": 32.9875,
+    "durian": 78.125,
+    "easter egg": 277.7778,
+    "eggplant": 300.0,
+    "glowmelon": 221.25,
+    "glowshroom": 533.3333,
+    "grape": 872.2222,
+    "lemon": 500.0,
+    "lotus": 42.5,
+    "mango": 29.125,
+    "mint": 5250.0,
+    "moon blossom": 5555.5556,
+    "moon mango": 222.2222,
+    "moon melon": 281.25,
+    "moonflower": 2375.0,
+    "moonglow": 649.9125,
+    "mushroom": 241.6,
+    "nightshade": 14000.0,
+    "passionfruit": 394.5,
+    "peach": 75.0,
+    "pear": 75.0,
+    "pepper": 320.0,
+    "pineapple": 222.2222,
+    "pumpkin": 190.4762,
+    "raspberry": 178.5,
+    "soulfruit": 3000.0,
+    "starfruit": 1666.6667,
+    "venus fly trap": 250.0,
+    "watermelon": 2708.3333
   };
 
-const plantBaseValues = {
-  "carrot": 265.0,
-  "strawberry": 170.0,
-  "blueberry": 500.0,
-  "orange tulip": 340000.0,
-  "tomato": 120.0,
-  "cactus": 69.3764,
-  "apple": 30.5556,
-  "banana": 777.7778,
-  "bamboo": 250.0,
-  "beanstalk": 200.0,
-  "blood banana": 2666.6667,
-  "cacao": 171.875,
-  "candy blossom": 11111.1111,
-  "candy sunflower": 35545.0,
-  "celestiberry": 2500.0,
-  "cherry blossom": 550.0,
-  "coconut": 2.0408,
-  "corn": 10.0,
-  "cranberry": 2000.0,
-  "daffodil": 25000.0,
-  "dragon fruit": 32.9875,
-  "durian": 78.125,
-  "easter egg": 277.7778,
-  "eggplant": 300.0,
-  "glowmelon": 221.25,
-  "glowshroom": 533.3333,
-  "grape": 872.2222,
-  "lemon": 500.0,
-  "lotus": 42.5,
-  "mango": 29.125,
-  "mint": 5250.0,
-  "moon blossom": 5555.5556,
-  "moon mango": 222.2222,
-  "moon melon": 281.25,
-  "moonflower": 2375.0,
-  "moonglow": 649.9125,
-  "mushroom": 241.6,
-  "nightshade": 14000.0,
-  "passionfruit": 394.5,
-  "peach": 75.0,
-  "pear": 75.0,
-  "pepper": 320.0,
-  "pineapple": 222.2222,
-  "pumpkin": 190.4762, // ✅ Added
-  "raspberry": 178.5,
-  "soulfruit": 3000.0,
-  "starfruit": 1666.6667,
-  "venus fly trap": 250.0,
-  "watermelon": 2708.3333
-};
+  // Mutation stack bonuses (additive inside parentheses)
+  const mutationStackBonuses = {
+    "None": 0,
+    "Wet": 1,
+    "Chilled": 1,
+    "Chocolate": 1,
+    "Moonlit": 1,
+    "Pollinated": 2,
+    "Bloodlit": 3,
+    "Plasma": 4,
+    "Honey Glazed": 4,
+    "Frozen": 9,
+    "Zombified": 24,
+    "Shocked": 99,
+    "Celestial": 119,
+    "Disco": 124,
+    "Voidtouched": 134
+  };
 
-
-  // Populate dropdown alphabetically
+  // Populate plant dropdown alphabetically
   const plantSelect = document.getElementById("plant");
   Object.keys(plantBaseValues).sort().forEach(p => {
     const option = document.createElement("option");
@@ -176,40 +187,52 @@ const plantBaseValues = {
     plantSelect.appendChild(option);
   });
 
-  const mutationSelect = document.getElementById("mutation");
   const weightInput = document.getElementById("weight");
-  const envCheckboxes = document.querySelectorAll(".stack-item input");
+  const baseMutationRadios = document.querySelectorAll('input[name="baseMutation"]');
+  const mutationCheckboxes = document.querySelectorAll('fieldset:nth-of-type(2) input[type="checkbox"]');
   const result = document.getElementById("result");
   const formula = document.getElementById("formula");
 
-  // Update when plant selection changes
+  // Add listeners
   plantSelect.addEventListener("change", updateValue);
-  mutationSelect.addEventListener("input", updateValue);
   weightInput.addEventListener("input", updateValue);
-  envCheckboxes.forEach(cb => cb.addEventListener("input", updateValue));
+  baseMutationRadios.forEach(radio => radio.addEventListener("change", updateValue));
+  mutationCheckboxes.forEach(cb => cb.addEventListener("change", updateValue));
 
   function updateValue() {
-    const growth = parseFloat(mutationSelect.value || 1);
-    const weight = parseFloat(weightInput.value || 0);
     const plant = plantSelect.value;
-    const base = (plantBaseValues[plant] || 1) / 100; // convert from cents to shekles
+    const base = plantBaseValues[plant] || 1;
+    const weight = parseFloat(weightInput.value) || 0;
 
-  let envMultiplier = 1;
-  envCheckboxes.forEach(cb => {
-    if (cb.checked) {
-      envMultiplier *= stackMultipliers[cb.value] || 1;
-    }
-  });
+    // Base multiplier from selected base mutation (1, 20, 50)
+    let baseMultiplier = 1;
+    baseMutationRadios.forEach(r => {
+      if (r.checked) baseMultiplier = parseFloat(r.value);
+    });
 
-    const total = base * (weight ** 2) * growth * envMultiplier;
+    // Sum all selected mutation stack bonuses additive inside parentheses
+    let stackBonusSum = 0;
+    mutationCheckboxes.forEach(cb => {
+      if (cb.checked) {
+        stackBonusSum += mutationStackBonuses[cb.value] || 0;
+      }
+    });
+
+    // The formula multiplier is baseMultiplier * (1 + stackBonusSum)
+    // According to your examples, the total multiplier includes +1 (default)
+    const totalMultiplier = baseMultiplier * (1 + stackBonusSum);
+
+    // Calculate total value: base × weight² × totalMultiplier
+    const total = base * (weight ** 2) * totalMultiplier;
+
     result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
 
-  const formulaText = `Base (${base.toFixed(4)}) × Weight² (${weight}²) × Growth (${growth}) × Env Multiplier (${envMultiplier.toFixed(2)})`;
-  formula.textContent = `🧮 ${formulaText}`;
+    // Display formula explanation
+    const formulaText = `Base (${base.toFixed(4)}) × Weight² (${weight}²) × Base Multiplier (${baseMultiplier}) × (1 + Stack Bonus Sum (${stackBonusSum})) = ${totalMultiplier.toFixed(2)} multiplier`;
+    formula.textContent = `🧮 ${formulaText}`;
   }
 
-  updateValue(); // Run on load
+  updateValue(); // Initial run on page load
 </script>
-
 </body>
 </html>
