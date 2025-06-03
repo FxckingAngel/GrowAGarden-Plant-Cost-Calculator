@@ -90,7 +90,7 @@
       <label class="stack-item"><input type="checkbox" value="Bloodlit" /> Bloodlit 🔥 (+3)</label>
       <label class="stack-item"><input type="checkbox" value="Plasma" /> Plasma ⚡ (+4)</label>
       <label class="stack-item"><input type="checkbox" value="Honey Glazed" /> Honey Glazed 🍯 (+4)</label>
-      <label class="stack-item"><input type="checkbox" value="Frozen" /> Frozen 🧊 (+15.01)</label>
+      <label class="stack-item"><input type="checkbox" value="Frozen" /> Frozen 🧊 (+14.01)</label>
       <label class="stack-item"><input type="checkbox" value="Zombified" /> Zombified 🧟 (+24)</label>
       <label class="stack-item"><input type="checkbox" value="Shocked" /> Shocked ⚡ (+99)</label>
       <label class="stack-item"><input type="checkbox" value="Celestial" /> Celestial 🌌 (+119)</label>
@@ -178,7 +178,7 @@
     "Bloodlit": 3,
     "Plasma": 4,
     "Honey Glazed": 4,
-    "Frozen": 15.01,
+    "Frozen": 14.01,
     "Zombified": 24,
     "Shocked": 99,
     "Celestial": 119,
@@ -233,7 +233,7 @@
 
     // The formula multiplier is baseMultiplier * (1 + stackBonusSum)
     // According to your examples, the total multiplier includes +1 (default)
-    const totalMultiplier = baseMultiplier * (stackBonusSum);
+    const totalMultiplier = baseMultiplier * (1 + stackBonusSum);
 
     // Calculate total value: base × weight² × totalMultiplier
     const total = base * (weight ** 2) * totalMultiplier * friendMultiplier;
@@ -241,7 +241,7 @@
     result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
 
     // Display formula explanation
-    const formulaText = `Base (${base.toFixed(4)}) × Weight² (${weight}²) × Base Multiplier (${baseMultiplier}) × (Stack Bonus Sum (${stackBonusSum})) = ${totalMultiplier.toFixed(2)} × Friend Boost (${friendMultiplier.toFixed(2)})`;
+    const formulaText = `Base (${base.toFixed(4)}) × Weight² (${weight}²) × Base Multiplier (${baseMultiplier}) × (1 +Stack Bonus Sum (${stackBonusSum})) = ${totalMultiplier.toFixed(2)} × Friend Boost (${friendMultiplier.toFixed(2)})`;
     formula.textContent = `🧮 ${formulaText}`;
   }
 
