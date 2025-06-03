@@ -102,6 +102,14 @@
   <label for="weight">⚖️ Input Weight (kg)</label>
   <input type="number" id="weight" placeholder="e.g. 0.17" step="0.01" />
 
+  <fieldset>
+  <legend>👥 Friend Boost</legend>
+  <label class="stack-item">
+    <input type="checkbox" id="friendBoost" /> Apply 10% Friend Boost (+10%)
+  </label>
+  </fieldset>
+
+
   <div class="output" id="result">💰 Total Value: 0 Sheckles</div>
   <div class="output" id="formula" style="font-size:1rem; color:#aaa; margin-top:0.5rem;"></div>
 
@@ -170,7 +178,7 @@
     "Bloodlit": 3,
     "Plasma": 4,
     "Honey Glazed": 4,
-    "Frozen": 9,
+    "Frozen": 1.5,
     "Zombified": 24,
     "Shocked": 99,
     "Celestial": 119,
@@ -198,11 +206,14 @@
   weightInput.addEventListener("input", updateValue);
   baseMutationRadios.forEach(radio => radio.addEventListener("change", updateValue));
   mutationCheckboxes.forEach(cb => cb.addEventListener("change", updateValue));
+  friendBoostCheckbox.addEventListener("change", updateValue);
 
   function updateValue() {
     const plant = plantSelect.value;
     const base = plantBaseValues[plant] || 1;
     const weight = parseFloat(weightInput.value) || 0;
+    const friendMultiplier = friendBoostCheckbox.checked ? 1.1 : 1;
+
 
     // Base multiplier from selected base mutation (1, 20, 50)
     let baseMultiplier = 1;
@@ -223,12 +234,12 @@
     const totalMultiplier = baseMultiplier * (1 + stackBonusSum);
 
     // Calculate total value: base × weight² × totalMultiplier
-    const total = base * (weight ** 2) * totalMultiplier;
+    const total = base * (weight ** 2) * totalMultiplier * friendMultiplier;
 
     result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
 
     // Display formula explanation
-    const formulaText = `Base (${base.toFixed(4)}) × Weight² (${weight}²) × Base Multiplier (${baseMultiplier}) × (1 + Stack Bonus Sum (${stackBonusSum})) = ${totalMultiplier.toFixed(2)} multiplier`;
+    const formulaText = `Base (${base.toFixed(4)}) × Weight² (${weight}²) × Base Multiplier (${baseMultiplier}) × (1 + Stack Bonus Sum (${stackBonusSum})) = ${totalMultiplier.toFixed(2)} × Friend Boost (${friendMultiplier.toFixed(2)})`;
     formula.textContent = `🧮 ${formulaText}`;
   }
 
