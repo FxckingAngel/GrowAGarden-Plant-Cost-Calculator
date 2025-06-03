@@ -74,7 +74,7 @@
 
   <fieldset>
     <legend>🧬 Base Mutation Multiplier</legend>
-    <label><input type="radio" name="baseMutation" value="1" checked /> None (×1)</label>
+    <label><input type="radio" name="baseMutation" value="1" checked /> None (×0)</label>
     <label><input type="radio" name="baseMutation" value="20" /> Golden ✨ (×20)</label>
     <label><input type="radio" name="baseMutation" value="50" /> Rainbow 🌈 (×50)</label>
   </fieldset>
@@ -233,7 +233,7 @@
 
     // The formula multiplier is baseMultiplier * (1 + stackBonusSum)
     // According to your examples, the total multiplier includes +1 (default)
-    const totalMultiplier = baseMultiplier * (1 + stackBonusSum);
+    const totalMultiplier = baseMultiplier * (stackBonusSum);
 
     // Calculate total value: base × weight² × totalMultiplier
     const total = base * (weight ** 2) * totalMultiplier * friendMultiplier;
@@ -241,7 +241,7 @@
     result.textContent = `💰 Total Value: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Sheckles`;
 
     // Display formula explanation
-    const formulaText = `Base (${base.toFixed(4)}) × Weight² (${weight}²) × Base Multiplier (${baseMultiplier}) × (1 + Stack Bonus Sum (${stackBonusSum})) = ${totalMultiplier.toFixed(2)} × Friend Boost (${friendMultiplier.toFixed(2)})`;
+    const formulaText = `Base (${base.toFixed(4)}) × Weight² (${weight}²) × Base Multiplier (${baseMultiplier}) × (Stack Bonus Sum (${stackBonusSum})) = ${totalMultiplier.toFixed(2)} × Friend Boost (${friendMultiplier.toFixed(2)})`;
     formula.textContent = `🧮 ${formulaText}`;
   }
 
